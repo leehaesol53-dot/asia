@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>아시아 국가와 도시 학습 게임</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1923;
+    --bg2: #162030;
+    --bg3: #1e2d3d;
+    --card: #1a2840;
+    --card2: #213350;
+    --accent: #4fc3f7;
+    --accent2: #81d4fa;
+    --gold: #ffd54f;
+    --green: #69f0ae;
+    --red: #ff5252;
+    --text: #e8f4fd;
+    --text2: #90b4ce;
+    --border: rgba(79,195,247,0.18);
+    --radius: 14px;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'Malgun Gothic', '맑은 고딕', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #0d2137 0%, #1a3a5c 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 24px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .header-title { font-size: 20px; font-weight: 700; color: var(--accent); letter-spacing: -0.3px; }
+  .header-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .score-bar { display: flex; gap: 14px; align-items: center; }
+  .score-item { text-align: center; }
+  .score-num { font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+  .score-label { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+  /* ── MAIN ── */
+  .main { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* ── SCREEN SYSTEM ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── HOME ── */
+  .home-hero {
+    text-align: center;
+    padding: 40px 20px 30px;
+  }
+  .globe-icon {
+    width: 90px; height: 90px;
+    background: radial-gradient(circle at 35% 35%, #4fc3f7, #1565c0);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 42px;
+    box-shadow: 0 0 30px rgba(79,195,247,0.35);
+  }
+  .home-title { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .home-desc { font-size: 15px; color: var(--text2); line-height: 1.7; margin-bottom: 32px; }
+
+  .mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .mode-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .mode-card:hover { background: var(--card2); border-color: var(--accent); transform: translateY(-2px); }
+  .mode-icon { font-size: 28px; margin-bottom: 10px; }
+  .mode-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .mode-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+  /* ── CITY LIST ── */
+  .city-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 16px; }
+  .city-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .city-card:hover { background: var(--card2); }
+  .city-flag { font-size: 24px; margin-bottom: 6px; }
+  .city-country { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .city-name { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .city-tag { font-size: 10px; color: var(--text2); margin-top: 4px; padding: 2px 6px; background: rgba(79,195,247,0.1); border-radius: 4px; display: inline-block; }
+
+  /* ── QUIZ GAME ── */
+  .quiz-progress {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .progress-bar-wrap { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; }
+  .progress-bar-fill { height: 6px; background: var(--accent); border-radius: 3px; transition: width 0.4s; }
+  .progress-text { font-size: 13px; color: var(--text2); min-width: 50px; text-align: right; }
+
+  .quiz-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px 24px;
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .quiz-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), #7c4dff);
+  }
+  .quiz-type-badge {
+    font-size: 11px; color: var(--accent); background: rgba(79,195,247,0.1);
+    padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 14px;
+  }
+  .quiz-question { font-size: 20px; font-weight: 700; color: var(--text); line-height: 1.5; }
+  .quiz-hint { font-size: 13px; color: var(--text2); margin-top: 8px; }
+
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .option-btn {
+    background: var(--card2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .option-btn:hover:not(:disabled) { background: #2a4060; border-color: var(--accent); }
+  .option-btn.correct { background: rgba(105,240,174,0.15); border-color: var(--green); color: var(--green); }
+  .option-btn.wrong { background: rgba(255,82,82,0.12); border-color: var(--red); color: var(--red); }
+  .option-btn:disabled { cursor: default; }
+  .option-letter {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(79,195,247,0.12); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--accent2);
+    flex-shrink: 0;
+  }
+
+  .feedback-box {
+    border-radius: 10px; padding: 14px 16px; margin-top: 14px; font-size: 14px; line-height: 1.6;
+    display: none;
+  }
+  .feedback-box.correct { background: rgba(105,240,174,0.1); border: 1px solid rgba(105,240,174,0.3); color: var(--green); }
+  .feedback-box.wrong { background: rgba(255,82,82,0.08); border: 1px solid rgba(255,82,82,0.25); color: #ff8a80; }
+  .feedback-box strong { display: block; font-size: 15px; margin-bottom: 4px; }
+
+  .next-btn {
+    width: 100%; padding: 15px; background: var(--accent); color: #062030;
+    border: none; border-radius: 10px; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.15s; display: none; margin-top: 10px;
+  }
+  .next-btn:hover { opacity: 0.88; }
+
+  /* ── MATCHING GAME ── */
+  .match-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .match-col-title { font-size: 12px; color: var(--text2); text-align: center; margin-bottom: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+  .match-item {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    margin-bottom: 8px;
+    user-select: none;
+  }
+  .match-item:hover { background: var(--card2); }
+  .match-item.selected { border-color: var(--accent); background: rgba(79,195,247,0.12); color: var(--accent); }
+  .match-item.matched { border-color: var(--green); background: rgba(105,240,174,0.1); color: var(--green); cursor: default; opacity: 0.7; }
+  .match-item.wrong-flash { border-color: var(--red); background: rgba(255,82,82,0.1); }
+
+  .match-info { text-align: center; margin-bottom: 16px; font-size: 13px; color: var(--text2); }
+  .match-progress { font-size: 20px; font-weight: 700; color: var(--accent); }
+
+  /* ── FILL BLANK ── */
+  .blank-question { font-size: 22px; font-weight: 700; margin-bottom: 20px; line-height: 1.6; }
+  .blank-input-wrap { display: flex; gap: 10px; margin-bottom: 16px; }
+  .blank-input {
+    flex: 1; padding: 14px 16px;
+    background: var(--card2); border: 1.5px solid var(--border);
+    border-radius: 10px; font-size: 16px; font-weight: 600;
+    color: var(--text); outline: none;
+    transition: border-color 0.15s;
+  }
+  .blank-input:focus { border-color: var(--accent); }
+  .blank-submit {
+    padding: 14px 22px; background: var(--accent); color: #062030;
+    border: none; border-radius: 10px; font-size: 15px; font-weight: 700;
+    cursor: pointer;
+  }
+  .hint-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .hint-tag {
+    padding: 5px 12px; background: rgba(79,195,247,0.08);
+    border: 1px solid var(--border); border-radius: 20px;
+    font-size: 12px; color: var(--text2); cursor: pointer; transition: all 0.15s;
+  }
+  .hint-tag:hover { background: rgba(79,195,247,0.16); color: var(--accent); }
+
+  /* ── RESULT ── */
+  .result-screen { text-align: center; padding: 30px 20px; }
+  .result-circle {
+    width: 120px; height: 120px; border-radius: 50%;
+    border: 4px solid var(--gold);
+    margin: 0 auto 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(255,213,79,0.07);
+  }
+  .result-score-big { font-size: 36px; font-weight: 800; color: var(--gold); }
+  .result-total { font-size: 14px; color: var(--text2); }
+  .result-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .result-msg { font-size: 15px; color: var(--text2); margin-bottom: 28px; line-height: 1.6; }
+  .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+  .result-stat { background: var(--card); border-radius: 10px; padding: 14px; }
+  .result-stat-num { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .result-stat-label { font-size: 12px; color: var(--text2); }
+
+  /* ── NAV BTN ── */
+  .nav-btn {
+    background: transparent; border: 1.5px solid var(--border);
+    color: var(--text2); padding: 9px 18px; border-radius: 8px;
+    font-size: 14px; cursor: pointer; transition: all 0.15s;
+  }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+  .btn-primary {
+    padding: 13px 30px; background: var(--accent); color: #062030;
+    border: none; border-radius: 10px; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+
+  /* ── TIMER ── */
+  .timer-ring { 
+    width: 48px; height: 48px;
+    position: relative; display: inline-flex;
+    align-items: center; justify-content: center;
+  }
+  .timer-svg { position: absolute; top:0; left:0; transform: rotate(-90deg); }
+  .timer-num { font-size: 16px; font-weight: 700; color: var(--accent); position: relative; z-index: 1; }
+  .timer-num.urgent { color: var(--red); }
+
+  /* ── MAP QUIZ ── */
+  .map-wrap { position: relative; width: 100%; margin-bottom: 16px; }
+  .map-wrap img { width: 100%; border-radius: 10px; display: block; }
+  .map-pin {
+    position: absolute; width: 28px; height: 28px;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+  }
+  .map-pin-inner {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--gold); border: 2px solid #fff;
+    box-shadow: 0 0 0 3px rgba(255,213,79,0.35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: #333;
+    transition: transform 0.15s;
+  }
+  .map-pin:hover .map-pin-inner { transform: scale(1.2); }
+  .map-pin.answered .map-pin-inner { background: var(--green); }
+
+  /* ── SECTION TITLE ── */
+  .section-title { font-size: 16px; font-weight: 700; color: var(--accent2); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .section-title::before { content: ''; display: inline-block; width: 3px; height: 18px; background: var(--accent); border-radius: 2px; }
+
+  .back-row { margin-bottom: 18px; }
+  .streak-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: rgba(255,213,79,0.12); border-radius: 20px; font-size: 13px; color: var(--gold); font-weight: 600; }
+
+  @media (max-width: 560px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .match-layout { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: repeat(3, 1fr); }
+    .home-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">🌏 아시아 국가와 도시</div>
+    <div class="header-sub">지리 학습 게임 · 중학교 사회</div>
+  </div>
+  <div class="score-bar">
+    <div class="score-item">
+      <div class="score-num" id="hdr-score">0</div>
+      <div class="score-label">점수</div>
+    </div>
+    <div class="score-item">
+      <div class="score-num" id="hdr-streak">0</div>
+      <div class="score-label">연속</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ══ HOME ══ -->
+  <div class="screen active" id="screen-home">
+    <div class="home-hero">
+      <div class="globe-icon">🌏</div>
+      <div class="home-title">아시아 국가와 도시 학습</div>
+      <div class="home-desc">9개 국가 · 9개 주요 도시를 게임으로 익혀요.<br>퀴즈, 매칭, 빈칸 채우기 3가지 모드로 도전!</div>
+    </div>
+
+    <div class="section-title">게임 모드 선택</div>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="startQuiz()">
+        <div class="mode-icon">❓</div>
+        <div class="mode-name">사지선다 퀴즈</div>
+        <div class="mode-desc">국가 · 도시 관련 문제를 보기 4개 중에서 골라요. 제한시간 있음!</div>
+      </div>
+      <div class="mode-card" onclick="startMatching()">
+        <div class="mode-icon">🔗</div>
+        <div class="mode-name">매칭 게임</div>
+        <div class="mode-desc">국가와 도시를 서로 연결해요. 모두 맞히면 클리어!</div>
+      </div>
+      <div class="mode-card" onclick="startFillBlank()">
+        <div class="mode-icon">✏️</div>
+        <div class="mode-name">빈칸 채우기</div>
+        <div class="mode-desc">도시 특징을 보고 국가 또는 도시 이름을 직접 입력해요.</div>
+      </div>
+      <div class="mode-card" onclick="showCityList()">
+        <div class="mode-icon">📖</div>
+        <div class="mode-name">도시 카드 보기</div>
+        <div class="mode-desc">9개 국가와 도시의 특징을 카드로 미리 학습해요.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CITY LIST ══ -->
+  <div class="screen" id="screen-list">
+    <div class="back-row"><button class="nav-btn" onclick="showScreen('home')">← 홈으로</button></div>
+    <div class="section-title">📖 아시아 국가와 도시 카드</div>
+    <div class="city-grid" id="city-grid"></div>
+  </div>
+
+  <!-- ══ QUIZ ══ -->
+  <div class="screen" id="screen-quiz">
+    <div class="back-row" style="display:flex;align-items:center;justify-content:space-between;">
+      <button class="nav-btn" onclick="showScreen('home')">← 홈으로</button>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="streak-badge" id="streak-display">🔥 0연속</span>
+        <div class="timer-ring">
+          <svg class="timer-svg" viewBox="0 0 48 48" width="48" height="48">
+            <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4"/>
+            <circle id="timer-circle" cx="24" cy="24" r="20" fill="none" stroke="#4fc3f7" stroke-width="4"
+              stroke-dasharray="125.6" stroke-dashoffset="0" stroke-linecap="round"/>
+          </svg>
+          <span class="timer-num" id="timer-num">15</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-progress">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="q-progress" style="width:0%"></div>
+      </div>
+      <div class="progress-text" id="q-count">1 / 12</div>
+    </div>
+
+    <div class="quiz-card">
+      <span class="quiz-type-badge" id="q-badge">국가 → 도시</span>
+      <div class="quiz-question" id="q-text"></div>
+      <div class="quiz-hint" id="q-hint"></div>
+    </div>
+
+    <div class="options-grid" id="options-grid"></div>
+    <div class="feedback-box" id="feedback-box"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">다음 문제 →</button>
+  </div>
+
+  <!-- ══ MATCHING ══ -->
+  <div class="screen" id="screen-match">
+    <div class="back-row"><button class="nav-btn" onclick="showScreen('home')">← 홈으로</button></div>
+    <div class="section-title">🔗 국가 ↔ 도시 매칭</div>
+    <div class="match-info">
+      <div>국가와 수도/주요 도시를 연결하세요</div>
+      <div class="match-progress" id="match-prog">0 / 9 완료</div>
+    </div>
+    <div class="match-layout">
+      <div>
+        <div class="match-col-title">🗺️ 국가</div>
+        <div id="match-countries"></div>
+      </div>
+      <div>
+        <div class="match-col-title">🏙️ 도시</div>
+        <div id="match-cities"></div>
+      </div>
+    </div>
+    <div id="match-feedback" style="text-align:center;margin-top:16px;font-size:14px;color:var(--text2);"></div>
+  </div>
+
+  <!-- ══ FILL BLANK ══ -->
+  <div class="screen" id="screen-fill">
+    <div class="back-row" style="display:flex;align-items:center;justify-content:space-between;">
+      <button class="nav-btn" onclick="showScreen('home')">← 홈으로</button>
+      <div class="progress-text" id="fill-count">1 / 9</div>
+    </div>
+    <div class="quiz-progress">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="fill-progress" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="quiz-card" style="margin-top:16px;">
+      <span class="quiz-type-badge" id="fill-badge">빈칸 채우기</span>
+      <div class="blank-question" id="fill-question"></div>
+      <div class="hint-tags" id="fill-hints"></div>
+    </div>
+    <div class="blank-input-wrap">
+      <input class="blank-input" type="text" id="fill-input" placeholder="답을 입력하세요..." onkeydown="if(event.key==='Enter')checkFill()">
+      <button class="blank-submit" onclick="checkFill()">확인</button>
+    </div>
+    <div class="feedback-box" id="fill-feedback"></div>
+    <button class="next-btn" id="fill-next" onclick="nextFill()">다음 문제 →</button>
+  </div>
+
+  <!-- ══ RESULT ══ -->
+  <div class="screen" id="screen-result">
+    <div class="result-screen">
+      <div class="result-circle">
+        <div class="result-score-big" id="res-score">0</div>
+        <div class="result-total" id="res-total">/ 0점</div>
+      </div>
+      <div class="result-title" id="res-title">결과</div>
+      <div class="result-msg" id="res-msg"></div>
+      <div class="result-grid">
+        <div class="result-stat">
+          <div class="result-stat-num" style="color:var(--green)" id="res-correct">0</div>
+          <div class="result-stat-label">정답</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-num" style="color:var(--red)" id="res-wrong">0</div>
+          <div class="result-stat-label">오답</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-num" style="color:var(--gold)" id="res-streak">0</div>
+          <div class="result-stat-label">최고 연속</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" id="res-retry">다시 도전</button>
+        <button class="nav-btn" onclick="showScreen('home')">홈으로</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ══════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════
+const cities = [
+  {
+    country: '우즈베키스탄', city: '사마르칸트', flag: '🇺🇿', region: '중앙아시아',
+    features: ['실크로드의 교역 통로', '다양한 이슬람 건축물', '아시아-유럽 교차점'],
+    emoji: '🏛️',
+    hint: '실크로드의 교역 중심지, 이슬람 건축물로 유명'
+  },
+  {
+    country: '인도', city: '뭄바이', flag: '🇮🇳', region: '남아시아',
+    features: ['매우 높은 인구 밀도', '발리우드: 영화 산업 중심지', '경제·금융 중심'],
+    emoji: '🎬',
+    hint: '발리우드 영화 산업의 중심지, 인도 경제 수도'
+  },
+  {
+    country: '아랍에미리트', city: '두바이', flag: '🇦🇪', region: '서남아시아',
+    features: ['사막 속의 첨단 도시', '석유를 기반으로 발전', '세계 최고층 건물 부르즈 할리파'],
+    emoji: '🏙️',
+    hint: '석유 자원으로 성장한 사막의 첨단 도시'
+  },
+  {
+    country: '싱가포르', city: '싱가포르', flag: '🇸🇬', region: '동남아시아',
+    features: ['세계적인 금융 중심지', '중국계·말레이계·인도계 다민족', '깔끔하고 질서있는 도시'],
+    emoji: '🦁',
+    hint: '다민족 공존의 깨끗한 도시국가, 세계 금융 허브'
+  },
+  {
+    country: '몽골', city: '울란바토르', flag: '🇲🇳', region: '동아시아',
+    features: ['초원의 수도', '대륙성 냉대기후', '유목 문화의 중심'],
+    emoji: '🐎',
+    hint: '광활한 초원의 나라, 대륙성 냉대기후 도시'
+  },
+  {
+    country: '이스라엘', city: '예루살렘', flag: '🇮🇱', region: '서남아시아',
+    features: ['유대교·이슬람교·기독교의 성지', '복잡한 정치 문제 존재', '이스라엘 vs 팔레스타인 분쟁'],
+    emoji: '✡️',
+    hint: '3대 종교의 성지, 이스라엘-팔레스타인 분쟁의 중심'
+  },
+  {
+    country: '베트남', city: '하롱베이', flag: '🇻🇳', region: '동남아시아',
+    features: ['유네스코 세계 자연유산', '석회암으로 이루어진 바위섬', '베트남의 대표 관광지'],
+    emoji: '⛵',
+    hint: '석회암 섬들이 펼쳐진 유네스코 세계자연유산'
+  },
+  {
+    country: '일본', city: '도쿄', flag: '🇯🇵', region: '동아시아',
+    features: ['아시아 최대 도시 중 하나', '세계의 정치·문화·경제에 큰 영향', '첨단 기술과 전통 문화 공존'],
+    emoji: '🗼',
+    hint: '세계 경제·문화 중심지, 도쿄 타워의 도시'
+  },
+  {
+    country: '방글라데시', city: '순다르반', flag: '🇧🇩', region: '남아시아',
+    features: ['세계 최대의 맹그로브 숲', '바닷물·민물이 만나는 해안 숲', '벵골호랑이·악어 등 희귀 동물 서식'],
+    emoji: '🐯',
+    hint: '세계 최대 맹그로브 숲, 벵골호랑이 서식지'
+  }
+];
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let totalScore = 0;
+let streak = 0;
+let bestStreak = 0;
+let currentMode = '';
+
+// Quiz state
+let quizQuestions = [];
+let quizIndex = 0;
+let quizCorrect = 0;
+let quizWrong = 0;
+let timerInterval = null;
+let timeLeft = 15;
+
+// Match state
+let matchSelected = null;
+let matchMatched = 0;
+let matchScore = 0;
+let matchWrong = 0;
+
+// Fill state
+let fillQuestions = [];
+let fillIndex = 0;
+let fillCorrect = 0;
+let fillWrong = 0;
+
+// ══════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+function updateHeader() {
+  document.getElementById('hdr-score').textContent = totalScore;
+  document.getElementById('hdr-streak').textContent = streak;
+}
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function getRandom(arr, n) {
+  return shuffle(arr).slice(0, n);
+}
+
+// ══════════════════════════════════════════════
+// CITY LIST
+// ══════════════════════════════════════════════
+function showCityList() {
+  showScreen('list');
+  const grid = document.getElementById('city-grid');
+  grid.innerHTML = cities.map(c => `
+    <div class="city-card">
+      <div class="city-flag">${c.flag}</div>
+      <div class="city-country">${c.country}</div>
+      <div class="city-name">${c.city}</div>
+      <div class="city-tag">${c.region}</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text2);text-align:left;">
+        ${c.features.map(f => `• ${f}`).join('<br>')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════
+// QUIZ GAME
+// ══════════════════════════════════════════════
+function buildQuizQuestions() {
+  const qs = [];
+  cities.forEach(c => {
+    // Q1: country → city
+    const wrong1 = getRandom(cities.filter(x => x.city !== c.city), 3).map(x => x.city);
+    qs.push({
+      badge: '국가 → 도시',
+      question: `${c.flag} ${c.country}의 주요 도시는?`,
+      hint: c.hint,
+      answer: c.city,
+      options: shuffle([c.city, ...wrong1]),
+      explain: `${c.country}의 주요 도시는 ${c.city}입니다. ${c.features[0]}`
+    });
+    // Q2: hint → country
+    const wrong2 = getRandom(cities.filter(x => x.country !== c.country), 3).map(x => x.country);
+    qs.push({
+      badge: '특징 → 국가',
+      question: `"${c.features[0]}"에 해당하는 나라는?`,
+      hint: `지역: ${c.region}`,
+      answer: c.country,
+      options: shuffle([c.country, ...wrong2]),
+      explain: `정답은 ${c.flag} ${c.country}입니다. (도시: ${c.city})`
+    });
+    // Q3: feature → city
+    const wrong3 = getRandom(cities.filter(x => x.city !== c.city), 3).map(x => x.city);
+    qs.push({
+      badge: '특징 → 도시',
+      question: `"${c.features[1]}"로 유명한 도시는?`,
+      hint: `국가: ${c.country} ${c.flag}`,
+      answer: c.city,
+      options: shuffle([c.city, ...wrong3]),
+      explain: `${c.city}는 ${c.country}의 주요 도시입니다. ${c.features[1]}`
+    });
+  });
+  return shuffle(qs).slice(0, 12);
+}
+
+function startQuiz() {
+  currentMode = 'quiz';
+  quizQuestions = buildQuizQuestions();
+  quizIndex = 0;
+  quizCorrect = 0;
+  quizWrong = 0;
+  streak = 0;
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = quizQuestions[quizIndex];
+  const total = quizQuestions.length;
+  document.getElementById('q-badge').textContent = q.badge;
+  document.getElementById('q-text').textContent = q.question;
+  document.getElementById('q-hint').textContent = q.hint;
+  document.getElementById('q-count').textContent = `${quizIndex + 1} / ${total}`;
+  document.getElementById('q-progress').style.width = ((quizIndex / total) * 100) + '%';
+  document.getElementById('streak-display').textContent = `🔥 ${streak}연속`;
+
+  const grid = document.getElementById('options-grid');
+  const letters = ['A', 'B', 'C', 'D'];
+  grid.innerHTML = q.options.map((opt, i) => `
+    <button class="option-btn" onclick="selectOption(this, '${opt.replace(/'/g, "\\'")}')">
+      <span class="option-letter">${letters[i]}</span>${opt}
+    </button>
+  `).join('');
+
+  document.getElementById('feedback-box').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = 15;
+  updateTimerUI(15, 15);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerUI(timeLeft, 15);
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timeExpired();
+    }
+  }, 1000);
+}
+
+function updateTimerUI(t, max) {
+  const circ = document.getElementById('timer-circle');
+  const num = document.getElementById('timer-num');
+  const len = 125.6;
+  circ.style.strokeDashoffset = len * (1 - t / max);
+  circ.style.stroke = t <= 5 ? '#ff5252' : '#4fc3f7';
+  num.textContent = t;
+  num.className = 'timer-num' + (t <= 5 ? ' urgent' : '');
+}
+
+function timeExpired() {
+  const q = quizQuestions[quizIndex];
+  streak = 0;
+  quizWrong++;
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent.includes(q.answer)) btn.classList.add('correct');
+  });
+  showFeedback(false, `⏰ 시간 초과! 정답: <strong>${q.answer}</strong><br>${q.explain}`);
+  updateHeader();
+}
+
+function selectOption(btn, selected) {
+  clearInterval(timerInterval);
+  const q = quizQuestions[quizIndex];
+  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+
+  if (selected === q.answer) {
+    btn.classList.add('correct');
+    streak++;
+    bestStreak = Math.max(bestStreak, streak);
+    const bonus = Math.min(streak, 5) * 5;
+    const timeBonus = Math.floor(timeLeft * 2);
+    const pts = 10 + bonus + timeBonus;
+    totalScore += pts;
+    quizCorrect++;
+    showFeedback(true, `✅ 정답! <strong>+${pts}점</strong> (시간보너스 +${timeBonus}, 연속보너스 +${bonus})<br>${q.explain}`);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.option-btn').forEach(b => {
+      if (b.textContent.includes(q.answer)) b.classList.add('correct');
+    });
+    streak = 0;
+    quizWrong++;
+    showFeedback(false, `❌ 오답! 정답은 <strong>${q.answer}</strong><br>${q.explain}`);
+  }
+  document.getElementById('streak-display').textContent = `🔥 ${streak}연속`;
+  updateHeader();
+}
+
+function showFeedback(correct, msg) {
+  const fb = document.getElementById('feedback-box');
+  fb.className = 'feedback-box ' + (correct ? 'correct' : 'wrong');
+  fb.innerHTML = msg;
+  fb.style.display = 'block';
+  document.getElementById('next-btn').style.display = 'block';
+}
+
+function nextQuestion() {
+  quizIndex++;
+  if (quizIndex >= quizQuestions.length) {
+    showResult('quiz');
+  } else {
+    renderQuestion();
+  }
+}
+
+// ══════════════════════════════════════════════
+// MATCHING GAME
+// ══════════════════════════════════════════════
+function startMatching() {
+  currentMode = 'match';
+  matchSelected = null;
+  matchMatched = 0;
+  matchScore = 0;
+  matchWrong = 0;
+  showScreen('match');
+
+  const shuffledCountries = shuffle(cities);
+  const shuffledCities = shuffle(cities);
+
+  const cDiv = document.getElementById('match-countries');
+  const ciDiv = document.getElementById('match-cities');
+
+  cDiv.innerHTML = shuffledCountries.map(c => `
+    <div class="match-item" id="mc-${c.country}" onclick="matchClick('country','${c.country}')">
+      ${c.flag} ${c.country}
+    </div>
+  `).join('');
+
+  ciDiv.innerHTML = shuffledCities.map(c => `
+    <div class="match-item" id="mci-${c.city}" onclick="matchClick('city','${c.city}')">
+      ${c.city}
+    </div>
+  `).join('');
+
+  document.getElementById('match-prog').textContent = `0 / ${cities.length} 완료`;
+  document.getElementById('match-feedback').textContent = '국가를 먼저 선택한 후 도시를 선택하세요';
+}
+
+function matchClick(type, val) {
+  if (!matchSelected) {
+    if (type !== 'country') { 
+      document.getElementById('match-feedback').textContent = '국가를 먼저 선택하세요!';
+      return;
+    }
+    matchSelected = { type, val };
+    document.getElementById('mc-' + val).classList.add('selected');
+    document.getElementById('match-feedback').textContent = `${val} 선택됨 → 해당 도시를 클릭하세요`;
+  } else {
+    if (type !== 'city') {
+      // re-select country
+      document.querySelectorAll('.match-item.selected').forEach(el => el.classList.remove('selected'));
+      matchSelected = { type, val };
+      document.getElementById('mc-' + val).classList.add('selected');
+      document.getElementById('match-feedback').textContent = `${val} 선택됨 → 해당 도시를 클릭하세요`;
+      return;
+    }
+    const selCountry = matchSelected.val;
+    document.getElementById('mc-' + selCountry).classList.remove('selected');
+    matchSelected = null;
+
+    const correct = cities.find(c => c.country === selCountry);
+    if (correct && correct.city === val) {
+      // correct
+      document.getElementById('mc-' + selCountry).classList.add('matched');
+      document.getElementById('mci-' + val).classList.add('matched');
+      document.getElementById('mc-' + selCountry).onclick = null;
+      document.getElementById('mci-' + val).onclick = null;
+      matchMatched++;
+      matchScore += 15;
+      totalScore += 15;
+      streak++;
+      bestStreak = Math.max(bestStreak, streak);
+      document.getElementById('match-feedback').textContent = `✅ 정답! ${selCountry} - ${val}`;
+      document.getElementById('match-prog').textContent = `${matchMatched} / ${cities.length} 완료`;
+      updateHeader();
+      if (matchMatched === cities.length) {
+        setTimeout(() => showResult('match'), 600);
+      }
+    } else {
+      // wrong
+      matchWrong++;
+      streak = 0;
+      const cEl = document.getElementById('mc-' + selCountry);
+      const ciEl = document.getElementById('mci-' + val);
+      cEl.classList.add('wrong-flash');
+      ciEl.classList.add('wrong-flash');
+      document.getElementById('match-feedback').textContent = `❌ 틀렸어요! ${selCountry}의 도시를 다시 찾아보세요`;
+      setTimeout(() => { cEl.classList.remove('wrong-flash'); ciEl.classList.remove('wrong-flash'); }, 600);
+      updateHeader();
+    }
+  }
+}
+
+// ══════════════════════════════════════════════
+// FILL BLANK
+// ══════════════════════════════════════════════
+function buildFillQuestions() {
+  return shuffle(cities.map(c => {
+    const askCity = Math.random() > 0.5;
+    return {
+      question: askCity
+        ? `다음 특징을 가진 ${c.country}의 주요 도시는?\n\n"${c.hint}"`
+        : `다음 도시 ${c.city}가 속한 나라는?\n\n"${c.hint}"`,
+      answer: askCity ? c.city : c.country,
+      answerAlt: askCity ? [c.city] : [c.country],
+      hints: c.features,
+      badge: askCity ? '도시 이름 쓰기' : '국가 이름 쓰기',
+      explain: `${c.flag} ${c.country} - ${c.city}: ${c.features.join(', ')}`
+    };
+  }));
+}
+
+function startFillBlank() {
+  currentMode = 'fill';
+  fillQuestions = buildFillQuestions();
+  fillIndex = 0;
+  fillCorrect = 0;
+  fillWrong = 0;
+  streak = 0;
+  showScreen('fill');
+  renderFill();
+}
+
+function renderFill() {
+  const q = fillQuestions[fillIndex];
+  const total = fillQuestions.length;
+  document.getElementById('fill-badge').textContent = q.badge;
+  document.getElementById('fill-question').textContent = q.question;
+  document.getElementById('fill-count').textContent = `${fillIndex + 1} / ${total}`;
+  document.getElementById('fill-progress').style.width = ((fillIndex / total) * 100) + '%';
+  document.getElementById('fill-feedback').style.display = 'none';
+  document.getElementById('fill-next').style.display = 'none';
+  document.getElementById('fill-input').value = '';
+  document.getElementById('fill-input').disabled = false;
+  document.getElementById('fill-input').focus();
+
+  const hintsDiv = document.getElementById('fill-hints');
+  hintsDiv.innerHTML = q.hints.map((h, i) => `<span class="hint-tag" onclick="useHint(${i})">힌트 ${i+1} 보기</span>`).join('');
+}
+
+function useHint(i) {
+  const q = fillQuestions[fillIndex];
+  const tags = document.querySelectorAll('.hint-tag');
+  tags[i].textContent = q.hints[i];
+  tags[i].style.color = 'var(--accent)';
+  tags[i].style.background = 'rgba(79,195,247,0.15)';
+  tags[i].onclick = null;
+}
+
+function checkFill() {
+  const q = fillQuestions[fillIndex];
+  const input = document.getElementById('fill-input');
+  const val = input.value.trim();
+  if (!val) return;
+  input.disabled = true;
+
+  const correct = q.answerAlt.some(a => a === val) || val === q.answer;
+  const fb = document.getElementById('fill-feedback');
+
+  if (correct) {
+    fb.className = 'feedback-box correct';
+    fb.innerHTML = `✅ 정답! <strong>+15점</strong><br>${q.explain}`;
+    fillCorrect++;
+    streak++;
+    bestStreak = Math.max(bestStreak, streak);
+    totalScore += 15;
+    input.style.borderColor = 'var(--green)';
+  } else {
+    fb.className = 'feedback-box wrong';
+    fb.innerHTML = `❌ 오답! 정답은 <strong>${q.answer}</strong><br>${q.explain}`;
+    fillWrong++;
+    streak = 0;
+    input.style.borderColor = 'var(--red)';
+  }
+  fb.style.display = 'block';
+  document.getElementById('fill-next').style.display = 'block';
+  updateHeader();
+}
+
+function nextFill() {
+  document.getElementById('fill-input').style.borderColor = '';
+  fillIndex++;
+  if (fillIndex >= fillQuestions.length) {
+    showResult('fill');
+  } else {
+    renderFill();
+  }
+}
+
+// ══════════════════════════════════════════════
+// RESULT
+// ══════════════════════════════════════════════
+function showResult(mode) {
+  clearInterval(timerInterval);
+  showScreen('result');
+  let correct, wrong, maxScore;
+  if (mode === 'quiz') {
+    correct = quizCorrect; wrong = quizWrong; maxScore = quizQuestions.length * 30;
+  } else if (mode === 'match') {
+    correct = matchMatched; wrong = matchWrong; maxScore = cities.length * 15;
+  } else {
+    correct = fillCorrect; wrong = fillWrong; maxScore = fillQuestions.length * 15;
+  }
+
+  const pct = maxScore ? Math.round((totalScore / maxScore) * 100) : 0;
+  document.getElementById('res-score').textContent = totalScore;
+  document.getElementById('res-total').textContent = `/ ${maxScore}점`;
+  document.getElementById('res-correct').textContent = correct;
+  document.getElementById('res-wrong').textContent = wrong;
+  document.getElementById('res-streak').textContent = bestStreak;
+
+  let title, msg;
+  if (pct >= 90) { title = '🏆 완벽해요!'; msg = '아시아 도시 박사! 모든 국가와 도시를 완벽하게 알고 있네요.'; }
+  else if (pct >= 70) { title = '🌟 훌륭해요!'; msg = '아시아 지리를 잘 이해하고 있어요. 조금 더 연습하면 완벽해질 거예요!'; }
+  else if (pct >= 50) { title = '📚 잘했어요!'; msg = '기본은 알고 있어요. 틀린 문제를 다시 복습해 보세요.'; }
+  else { title = '💪 다시 도전!'; msg = '도시 카드를 먼저 학습하고 다시 도전해 보세요. 할 수 있어요!'; }
+
+  document.getElementById('res-title').textContent = title;
+  document.getElementById('res-msg').textContent = msg;
+
+  const retryBtn = document.getElementById('res-retry');
+  retryBtn.onclick = () => {
+    totalScore = 0; streak = 0; bestStreak = 0; updateHeader();
+    if (mode === 'quiz') startQuiz();
+    else if (mode === 'match') startMatching();
+    else startFillBlank();
+  };
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+updateHeader();
+</script>
+</body>
+</html>
