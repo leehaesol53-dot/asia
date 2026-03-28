@@ -5,301 +5,126 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>아시아 국가와 도시 학습 게임</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0f1923; --bg2: #162030; --bg3: #1e2d3d;
+  --card: #1a2840; --card2: #213350;
+  --accent: #4fc3f7; --accent2: #81d4fa;
+  --gold: #ffd54f; --green: #69f0ae; --red: #ff5252;
+  --text: #e8f4fd; --text2: #90b4ce;
+  --border: rgba(79,195,247,0.18);
+  --radius: 14px;
+}
+body { font-family: 'Segoe UI','Malgun Gothic','맑은 고딕',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+.header { background: linear-gradient(135deg,#0d2137,#1a3a5c); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.header-title { font-size: 18px; font-weight: 700; color: var(--accent); }
+.header-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.score-bar { display: flex; gap: 16px; }
+.score-item { text-align: center; }
+.score-num { font-size: 20px; font-weight: 700; color: var(--gold); line-height: 1; }
+.score-label { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.main { max-width: 980px; margin: 0 auto; padding: 20px 14px 60px; }
+.screen { display: none; } .screen.active { display: block; }
 
-  :root {
-    --bg: #0f1923;
-    --bg2: #162030;
-    --bg3: #1e2d3d;
-    --card: #1a2840;
-    --card2: #213350;
-    --accent: #4fc3f7;
-    --accent2: #81d4fa;
-    --gold: #ffd54f;
-    --green: #69f0ae;
-    --red: #ff5252;
-    --text: #e8f4fd;
-    --text2: #90b4ce;
-    --border: rgba(79,195,247,0.18);
-    --radius: 14px;
-  }
+/* HOME */
+.home-hero { text-align: center; padding: 32px 16px 24px; }
+.globe-icon { width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle at 35% 35%,#4fc3f7,#1565c0); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 38px; box-shadow: 0 0 28px rgba(79,195,247,0.35); }
+.home-title { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+.home-desc { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 28px; }
+.mode-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap: 12px; }
+.mode-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; cursor: pointer; transition: all 0.2s; text-align: left; }
+.mode-card:hover { background: var(--card2); border-color: var(--accent); transform: translateY(-2px); }
+.mode-icon { font-size: 28px; margin-bottom: 10px; }
+.mode-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.mode-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
 
-  body {
-    font-family: 'Segoe UI', 'Malgun Gothic', '맑은 고딕', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 0;
-  }
+/* CITY LIST */
+.city-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(148px,1fr)); gap: 10px; margin-top: 14px; }
+.city-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 12px; text-align: center; transition: all 0.2s; }
+.city-card:hover { background: var(--card2); }
+.city-flag { font-size: 24px; margin-bottom: 6px; }
+.city-country { font-size: 13px; font-weight: 700; color: var(--accent); }
+.city-name { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.city-tag { font-size: 10px; color: var(--text2); margin-top: 4px; padding: 2px 6px; background: rgba(79,195,247,0.1); border-radius: 4px; display: inline-block; }
+.city-features { margin-top: 8px; font-size: 11px; color: var(--text2); text-align: left; line-height: 1.5; }
 
-  /* ── HEADER ── */
-  .header {
-    background: linear-gradient(135deg, #0d2137 0%, #1a3a5c 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 18px 24px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .header-title { font-size: 20px; font-weight: 700; color: var(--accent); letter-spacing: -0.3px; }
-  .header-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
-  .score-bar { display: flex; gap: 14px; align-items: center; }
-  .score-item { text-align: center; }
-  .score-num { font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
-  .score-label { font-size: 11px; color: var(--text2); margin-top: 2px; }
+/* QUIZ */
+.quiz-progress { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.prog-bar-wrap { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; }
+.prog-bar-fill { height: 6px; background: var(--accent); border-radius: 3px; transition: width 0.4s; }
+.prog-text { font-size: 13px; color: var(--text2); min-width: 48px; text-align: right; }
+.quiz-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px 20px; margin-bottom: 14px; position: relative; overflow: hidden; }
+.quiz-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg,var(--accent),#7c4dff); }
+.q-badge { font-size: 11px; color: var(--accent); background: rgba(79,195,247,0.1); padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 12px; }
+.q-text { font-size: 19px; font-weight: 700; line-height: 1.5; }
+.q-hint { font-size: 13px; color: var(--text2); margin-top: 6px; }
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+.opt-btn { background: var(--card2); border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 14px; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; transition: all 0.15s; text-align: left; display: flex; align-items: center; gap: 10px; }
+.opt-btn:hover:not(:disabled) { background: #2a4060; border-color: var(--accent); }
+.opt-btn.correct { background: rgba(105,240,174,0.15); border-color: var(--green); color: var(--green); }
+.opt-btn.wrong { background: rgba(255,82,82,0.12); border-color: var(--red); color: var(--red); }
+.opt-btn:disabled { cursor: default; }
+.opt-letter { width: 24px; height: 24px; border-radius: 50%; background: rgba(79,195,247,0.12); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent2); flex-shrink: 0; }
+.feedback-box { border-radius: 10px; padding: 12px 14px; margin-top: 12px; font-size: 13px; line-height: 1.6; display: none; }
+.feedback-box.correct { background: rgba(105,240,174,0.1); border: 1px solid rgba(105,240,174,0.3); color: var(--green); }
+.feedback-box.wrong { background: rgba(255,82,82,0.08); border: 1px solid rgba(255,82,82,0.25); color: #ff8a80; }
+.next-btn { width: 100%; padding: 14px; background: var(--accent); color: #062030; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; display: none; margin-top: 10px; }
+.next-btn:hover { opacity: 0.88; }
+.timer-wrap { display: flex; align-items: center; gap: 12px; }
+.timer-ring { width: 44px; height: 44px; position: relative; display: inline-flex; align-items: center; justify-content: center; }
+.timer-svg { position: absolute; top:0; left:0; transform: rotate(-90deg); }
+.timer-num { font-size: 14px; font-weight: 700; color: var(--accent); position: relative; z-index:1; }
+.timer-num.urgent { color: var(--red); }
+.streak-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: rgba(255,213,79,0.12); border-radius: 20px; font-size: 13px; color: var(--gold); font-weight: 600; }
 
-  /* ── MAIN ── */
-  .main { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; }
+/* MAP GAME */
+.map-game-layout { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+@media(max-width:720px){ .map-game-layout { grid-template-columns: 1fr; } }
+.map-container { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #0d2137; cursor: crosshair; user-select: none; }
+.map-sidebar { display: flex; flex-direction: column; gap: 12px; }
+.target-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 16px; position: relative; overflow: hidden; }
+.target-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg,var(--gold),#ff9800); }
+.target-label { font-size: 11px; color: var(--text2); margin-bottom: 8px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+.target-city { font-size: 22px; font-weight: 800; color: var(--gold); margin-bottom: 4px; }
+.target-country { font-size: 15px; color: var(--text); margin-bottom: 8px; }
+.target-hint { font-size: 12px; color: var(--text2); line-height: 1.5; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 10px; }
+.dist-result { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; display: none; }
+.dist-num { font-size: 26px; font-weight: 800; }
+.dist-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.dist-bar-wrap { height: 8px; background: var(--bg3); border-radius: 4px; margin: 8px 0; overflow: hidden; }
+.dist-bar-fill { height: 8px; border-radius: 4px; transition: width 0.8s; }
+.dist-pts { font-size: 15px; font-weight: 700; margin-top: 6px; }
+.map-rounds { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.map-round-title { font-size: 11px; color: var(--text2); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+.round-dots { display: flex; gap: 6px; flex-wrap: wrap; }
+.round-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--text2); transition: all 0.3s; }
+.round-dot.done-correct { background: rgba(105,240,174,0.2); border-color: var(--green); color: var(--green); }
+.round-dot.done-wrong { background: rgba(255,82,82,0.15); border-color: var(--red); color: var(--red); }
+.round-dot.current { border-color: var(--gold); color: var(--gold); background: rgba(255,213,79,0.1); }
+.map-next-btn { width: 100%; padding: 13px; background: var(--accent); color: #062030; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; display: none; }
+.map-next-btn:hover { opacity: 0.88; }
+.map-instruction { font-size: 12px; color: var(--text2); text-align: center; padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 8px; line-height: 1.6; }
 
-  /* ── SCREEN SYSTEM ── */
-  .screen { display: none; }
-  .screen.active { display: block; }
-
-  /* ── HOME ── */
-  .home-hero {
-    text-align: center;
-    padding: 40px 20px 30px;
-  }
-  .globe-icon {
-    width: 90px; height: 90px;
-    background: radial-gradient(circle at 35% 35%, #4fc3f7, #1565c0);
-    border-radius: 50%;
-    margin: 0 auto 20px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 42px;
-    box-shadow: 0 0 30px rgba(79,195,247,0.35);
-  }
-  .home-title { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
-  .home-desc { font-size: 15px; color: var(--text2); line-height: 1.7; margin-bottom: 32px; }
-
-  .mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
-  .mode-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: left;
-  }
-  .mode-card:hover { background: var(--card2); border-color: var(--accent); transform: translateY(-2px); }
-  .mode-icon { font-size: 28px; margin-bottom: 10px; }
-  .mode-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-  .mode-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
-
-  /* ── CITY LIST ── */
-  .city-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 16px; }
-  .city-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 12px;
-    text-align: center;
-    transition: all 0.2s;
-    cursor: default;
-  }
-  .city-card:hover { background: var(--card2); }
-  .city-flag { font-size: 24px; margin-bottom: 6px; }
-  .city-country { font-size: 13px; font-weight: 700; color: var(--accent); }
-  .city-name { font-size: 12px; color: var(--text2); margin-top: 2px; }
-  .city-tag { font-size: 10px; color: var(--text2); margin-top: 4px; padding: 2px 6px; background: rgba(79,195,247,0.1); border-radius: 4px; display: inline-block; }
-
-  /* ── QUIZ GAME ── */
-  .quiz-progress {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-  }
-  .progress-bar-wrap { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; }
-  .progress-bar-fill { height: 6px; background: var(--accent); border-radius: 3px; transition: width 0.4s; }
-  .progress-text { font-size: 13px; color: var(--text2); min-width: 50px; text-align: right; }
-
-  .quiz-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px 24px 24px;
-    margin-bottom: 18px;
-    position: relative;
-    overflow: hidden;
-  }
-  .quiz-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--accent), #7c4dff);
-  }
-  .quiz-type-badge {
-    font-size: 11px; color: var(--accent); background: rgba(79,195,247,0.1);
-    padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 14px;
-  }
-  .quiz-question { font-size: 20px; font-weight: 700; color: var(--text); line-height: 1.5; }
-  .quiz-hint { font-size: 13px; color: var(--text2); margin-top: 8px; }
-
-  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
-  .option-btn {
-    background: var(--card2);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .option-btn:hover:not(:disabled) { background: #2a4060; border-color: var(--accent); }
-  .option-btn.correct { background: rgba(105,240,174,0.15); border-color: var(--green); color: var(--green); }
-  .option-btn.wrong { background: rgba(255,82,82,0.12); border-color: var(--red); color: var(--red); }
-  .option-btn:disabled { cursor: default; }
-  .option-letter {
-    width: 26px; height: 26px; border-radius: 50%;
-    background: rgba(79,195,247,0.12); border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; color: var(--accent2);
-    flex-shrink: 0;
-  }
-
-  .feedback-box {
-    border-radius: 10px; padding: 14px 16px; margin-top: 14px; font-size: 14px; line-height: 1.6;
-    display: none;
-  }
-  .feedback-box.correct { background: rgba(105,240,174,0.1); border: 1px solid rgba(105,240,174,0.3); color: var(--green); }
-  .feedback-box.wrong { background: rgba(255,82,82,0.08); border: 1px solid rgba(255,82,82,0.25); color: #ff8a80; }
-  .feedback-box strong { display: block; font-size: 15px; margin-bottom: 4px; }
-
-  .next-btn {
-    width: 100%; padding: 15px; background: var(--accent); color: #062030;
-    border: none; border-radius: 10px; font-size: 16px; font-weight: 700;
-    cursor: pointer; transition: opacity 0.15s; display: none; margin-top: 10px;
-  }
-  .next-btn:hover { opacity: 0.88; }
-
-  /* ── MATCHING GAME ── */
-  .match-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .match-col-title { font-size: 12px; color: var(--text2); text-align: center; margin-bottom: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-  .match-item {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    padding: 13px 14px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: center;
-    margin-bottom: 8px;
-    user-select: none;
-  }
-  .match-item:hover { background: var(--card2); }
-  .match-item.selected { border-color: var(--accent); background: rgba(79,195,247,0.12); color: var(--accent); }
-  .match-item.matched { border-color: var(--green); background: rgba(105,240,174,0.1); color: var(--green); cursor: default; opacity: 0.7; }
-  .match-item.wrong-flash { border-color: var(--red); background: rgba(255,82,82,0.1); }
-
-  .match-info { text-align: center; margin-bottom: 16px; font-size: 13px; color: var(--text2); }
-  .match-progress { font-size: 20px; font-weight: 700; color: var(--accent); }
-
-  /* ── FILL BLANK ── */
-  .blank-question { font-size: 22px; font-weight: 700; margin-bottom: 20px; line-height: 1.6; }
-  .blank-input-wrap { display: flex; gap: 10px; margin-bottom: 16px; }
-  .blank-input {
-    flex: 1; padding: 14px 16px;
-    background: var(--card2); border: 1.5px solid var(--border);
-    border-radius: 10px; font-size: 16px; font-weight: 600;
-    color: var(--text); outline: none;
-    transition: border-color 0.15s;
-  }
-  .blank-input:focus { border-color: var(--accent); }
-  .blank-submit {
-    padding: 14px 22px; background: var(--accent); color: #062030;
-    border: none; border-radius: 10px; font-size: 15px; font-weight: 700;
-    cursor: pointer;
-  }
-  .hint-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-  .hint-tag {
-    padding: 5px 12px; background: rgba(79,195,247,0.08);
-    border: 1px solid var(--border); border-radius: 20px;
-    font-size: 12px; color: var(--text2); cursor: pointer; transition: all 0.15s;
-  }
-  .hint-tag:hover { background: rgba(79,195,247,0.16); color: var(--accent); }
-
-  /* ── RESULT ── */
-  .result-screen { text-align: center; padding: 30px 20px; }
-  .result-circle {
-    width: 120px; height: 120px; border-radius: 50%;
-    border: 4px solid var(--gold);
-    margin: 0 auto 20px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: rgba(255,213,79,0.07);
-  }
-  .result-score-big { font-size: 36px; font-weight: 800; color: var(--gold); }
-  .result-total { font-size: 14px; color: var(--text2); }
-  .result-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
-  .result-msg { font-size: 15px; color: var(--text2); margin-bottom: 28px; line-height: 1.6; }
-  .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
-  .result-stat { background: var(--card); border-radius: 10px; padding: 14px; }
-  .result-stat-num { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
-  .result-stat-label { font-size: 12px; color: var(--text2); }
-
-  /* ── NAV BTN ── */
-  .nav-btn {
-    background: transparent; border: 1.5px solid var(--border);
-    color: var(--text2); padding: 9px 18px; border-radius: 8px;
-    font-size: 14px; cursor: pointer; transition: all 0.15s;
-  }
-  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
-  .btn-primary {
-    padding: 13px 30px; background: var(--accent); color: #062030;
-    border: none; border-radius: 10px; font-size: 16px; font-weight: 700;
-    cursor: pointer; transition: opacity 0.15s;
-  }
-  .btn-primary:hover { opacity: 0.88; }
-
-  /* ── TIMER ── */
-  .timer-ring { 
-    width: 48px; height: 48px;
-    position: relative; display: inline-flex;
-    align-items: center; justify-content: center;
-  }
-  .timer-svg { position: absolute; top:0; left:0; transform: rotate(-90deg); }
-  .timer-num { font-size: 16px; font-weight: 700; color: var(--accent); position: relative; z-index: 1; }
-  .timer-num.urgent { color: var(--red); }
-
-  /* ── MAP QUIZ ── */
-  .map-wrap { position: relative; width: 100%; margin-bottom: 16px; }
-  .map-wrap img { width: 100%; border-radius: 10px; display: block; }
-  .map-pin {
-    position: absolute; width: 28px; height: 28px;
-    transform: translate(-50%, -50%);
-    cursor: pointer;
-  }
-  .map-pin-inner {
-    width: 20px; height: 20px; border-radius: 50%;
-    background: var(--gold); border: 2px solid #fff;
-    box-shadow: 0 0 0 3px rgba(255,213,79,0.35);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 700; color: #333;
-    transition: transform 0.15s;
-  }
-  .map-pin:hover .map-pin-inner { transform: scale(1.2); }
-  .map-pin.answered .map-pin-inner { background: var(--green); }
-
-  /* ── SECTION TITLE ── */
-  .section-title { font-size: 16px; font-weight: 700; color: var(--accent2); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-  .section-title::before { content: ''; display: inline-block; width: 3px; height: 18px; background: var(--accent); border-radius: 2px; }
-
-  .back-row { margin-bottom: 18px; }
-  .streak-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: rgba(255,213,79,0.12); border-radius: 20px; font-size: 13px; color: var(--gold); font-weight: 600; }
-
-  @media (max-width: 560px) {
-    .options-grid { grid-template-columns: 1fr; }
-    .match-layout { grid-template-columns: 1fr; }
-    .result-grid { grid-template-columns: repeat(3, 1fr); }
-    .home-title { font-size: 22px; }
-  }
+/* RESULT */
+.result-screen { text-align: center; padding: 28px 16px; }
+.result-circle { width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--gold); margin: 0 auto 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,213,79,0.07); }
+.result-score-big { font-size: 32px; font-weight: 800; color: var(--gold); }
+.result-total { font-size: 13px; color: var(--text2); }
+.result-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.result-msg { font-size: 14px; color: var(--text2); margin-bottom: 24px; line-height: 1.6; }
+.result-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 24px; }
+.result-stat { background: var(--card); border-radius: 10px; padding: 12px; }
+.result-stat-num { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.result-stat-label { font-size: 11px; color: var(--text2); }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.btn-primary { padding: 13px 28px; background: var(--accent); color: #062030; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
+.btn-primary:hover { opacity: 0.88; }
+.nav-btn { background: transparent; border: 1.5px solid var(--border); color: var(--text2); padding: 9px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: all 0.15s; }
+.nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.back-row { margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.section-title { font-size: 15px; font-weight: 700; color: var(--accent2); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.section-title::before { content:''; display:inline-block; width:3px; height:16px; background:var(--accent); border-radius:2px; }
+@media(max-width:540px){ .options-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -310,43 +135,30 @@
     <div class="header-sub">지리 학습 게임 · 중학교 사회</div>
   </div>
   <div class="score-bar">
-    <div class="score-item">
-      <div class="score-num" id="hdr-score">0</div>
-      <div class="score-label">점수</div>
-    </div>
-    <div class="score-item">
-      <div class="score-num" id="hdr-streak">0</div>
-      <div class="score-label">연속</div>
-    </div>
+    <div class="score-item"><div class="score-num" id="hdr-score">0</div><div class="score-label">점수</div></div>
+    <div class="score-item"><div class="score-num" id="hdr-streak">0</div><div class="score-label">연속</div></div>
   </div>
 </div>
 
 <div class="main">
 
-  <!-- ══ HOME ══ -->
+  <!-- HOME -->
   <div class="screen active" id="screen-home">
     <div class="home-hero">
       <div class="globe-icon">🌏</div>
       <div class="home-title">아시아 국가와 도시 학습</div>
-      <div class="home-desc">9개 국가 · 9개 주요 도시를 게임으로 익혀요.<br>퀴즈, 매칭, 빈칸 채우기 3가지 모드로 도전!</div>
+      <div class="home-desc">9개 국가 · 9개 주요 도시를 게임으로 익혀요.<br>지도 위치 찾기, 사지선다 퀴즈, 도시 카드 학습 3가지!</div>
     </div>
-
-    <div class="section-title">게임 모드 선택</div>
     <div class="mode-grid">
+      <div class="mode-card" onclick="startMapGame()">
+        <div class="mode-icon">📍</div>
+        <div class="mode-name">지도에서 위치 찾기</div>
+        <div class="mode-desc">실제 아시아 지도에서 도시 위치를 직접 클릭해 찾아요. 가까울수록 높은 점수!</div>
+      </div>
       <div class="mode-card" onclick="startQuiz()">
         <div class="mode-icon">❓</div>
         <div class="mode-name">사지선다 퀴즈</div>
-        <div class="mode-desc">국가 · 도시 관련 문제를 보기 4개 중에서 골라요. 제한시간 있음!</div>
-      </div>
-      <div class="mode-card" onclick="startMatching()">
-        <div class="mode-icon">🔗</div>
-        <div class="mode-name">매칭 게임</div>
-        <div class="mode-desc">국가와 도시를 서로 연결해요. 모두 맞히면 클리어!</div>
-      </div>
-      <div class="mode-card" onclick="startFillBlank()">
-        <div class="mode-icon">✏️</div>
-        <div class="mode-name">빈칸 채우기</div>
-        <div class="mode-desc">도시 특징을 보고 국가 또는 도시 이름을 직접 입력해요.</div>
+        <div class="mode-desc">국가·도시 관련 문제를 보기 4개 중에서 골라요. 제한시간 15초!</div>
       </div>
       <div class="mode-card" onclick="showCityList()">
         <div class="mode-icon">📖</div>
@@ -356,94 +168,151 @@
     </div>
   </div>
 
-  <!-- ══ CITY LIST ══ -->
+  <!-- CITY LIST -->
   <div class="screen" id="screen-list">
     <div class="back-row"><button class="nav-btn" onclick="showScreen('home')">← 홈으로</button></div>
     <div class="section-title">📖 아시아 국가와 도시 카드</div>
     <div class="city-grid" id="city-grid"></div>
   </div>
 
-  <!-- ══ QUIZ ══ -->
+  <!-- QUIZ -->
   <div class="screen" id="screen-quiz">
-    <div class="back-row" style="display:flex;align-items:center;justify-content:space-between;">
+    <div class="back-row">
       <button class="nav-btn" onclick="showScreen('home')">← 홈으로</button>
-      <div style="display:flex;align-items:center;gap:12px;">
+      <div class="timer-wrap">
         <span class="streak-badge" id="streak-display">🔥 0연속</span>
         <div class="timer-ring">
-          <svg class="timer-svg" viewBox="0 0 48 48" width="48" height="48">
-            <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4"/>
-            <circle id="timer-circle" cx="24" cy="24" r="20" fill="none" stroke="#4fc3f7" stroke-width="4"
-              stroke-dasharray="125.6" stroke-dashoffset="0" stroke-linecap="round"/>
+          <svg class="timer-svg" viewBox="0 0 44 44" width="44" height="44">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4"/>
+            <circle id="timer-circle" cx="22" cy="22" r="18" fill="none" stroke="#4fc3f7" stroke-width="4"
+              stroke-dasharray="113.1" stroke-dashoffset="0" stroke-linecap="round"/>
           </svg>
           <span class="timer-num" id="timer-num">15</span>
         </div>
       </div>
     </div>
-
     <div class="quiz-progress">
-      <div class="progress-bar-wrap">
-        <div class="progress-bar-fill" id="q-progress" style="width:0%"></div>
-      </div>
-      <div class="progress-text" id="q-count">1 / 12</div>
+      <div class="prog-bar-wrap"><div class="prog-bar-fill" id="q-progress" style="width:0%"></div></div>
+      <div class="prog-text" id="q-count">1 / 12</div>
     </div>
-
     <div class="quiz-card">
-      <span class="quiz-type-badge" id="q-badge">국가 → 도시</span>
-      <div class="quiz-question" id="q-text"></div>
-      <div class="quiz-hint" id="q-hint"></div>
+      <span class="q-badge" id="q-badge">국가 → 도시</span>
+      <div class="q-text" id="q-text"></div>
+      <div class="q-hint" id="q-hint"></div>
     </div>
-
     <div class="options-grid" id="options-grid"></div>
     <div class="feedback-box" id="feedback-box"></div>
     <button class="next-btn" id="next-btn" onclick="nextQuestion()">다음 문제 →</button>
   </div>
 
-  <!-- ══ MATCHING ══ -->
-  <div class="screen" id="screen-match">
-    <div class="back-row"><button class="nav-btn" onclick="showScreen('home')">← 홈으로</button></div>
-    <div class="section-title">🔗 국가 ↔ 도시 매칭</div>
-    <div class="match-info">
-      <div>국가와 수도/주요 도시를 연결하세요</div>
-      <div class="match-progress" id="match-prog">0 / 9 완료</div>
-    </div>
-    <div class="match-layout">
-      <div>
-        <div class="match-col-title">🗺️ 국가</div>
-        <div id="match-countries"></div>
-      </div>
-      <div>
-        <div class="match-col-title">🏙️ 도시</div>
-        <div id="match-cities"></div>
-      </div>
-    </div>
-    <div id="match-feedback" style="text-align:center;margin-top:16px;font-size:14px;color:var(--text2);"></div>
-  </div>
-
-  <!-- ══ FILL BLANK ══ -->
-  <div class="screen" id="screen-fill">
-    <div class="back-row" style="display:flex;align-items:center;justify-content:space-between;">
+  <!-- MAP GAME -->
+  <div class="screen" id="screen-map">
+    <div class="back-row">
       <button class="nav-btn" onclick="showScreen('home')">← 홈으로</button>
-      <div class="progress-text" id="fill-count">1 / 9</div>
+      <span style="font-size:13px;color:var(--text2)" id="map-round-label">라운드 1 / 9</span>
     </div>
-    <div class="quiz-progress">
-      <div class="progress-bar-wrap">
-        <div class="progress-bar-fill" id="fill-progress" style="width:0%"></div>
+    <div class="map-game-layout">
+      <div>
+        <div class="map-container" id="map-container">
+          <svg id="asia-svg" viewBox="0 0 860 560" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;cursor:crosshair;">
+            <!-- 바다 -->
+            <rect width="860" height="560" fill="#0a1a2e"/>
+            <!-- 격자 -->
+            <line x1="0" y1="140" x2="860" y2="140" stroke="rgba(79,195,247,0.06)" stroke-width="1"/>
+            <line x1="0" y1="280" x2="860" y2="280" stroke="rgba(79,195,247,0.06)" stroke-width="1"/>
+            <line x1="0" y1="420" x2="860" y2="420" stroke="rgba(79,195,247,0.06)" stroke-width="1"/>
+            <line x1="172" y1="0" x2="172" y2="560" stroke="rgba(79,195,247,0.06)" stroke-width="1"/>
+            <line x1="344" y1="0" x2="344" y2="560" stroke="rgba(79,195,247,0.06)" stroke-width="1"/>
+            <line x1="516" y1="0" x2="516" y2="560" stroke="rgba(79,195,247,0.06)" stroke-width="1"/>
+            <line x1="688" y1="0" x2="688" y2="560" stroke="rgba(79,195,247,0.06)" stroke-width="1"/>
+            <!-- 러시아/북아시아 -->
+            <path d="M60,10 L200,8 L360,6 L520,8 L660,12 L750,25 L780,50 L760,75 L700,82 L620,78 L530,75 L440,73 L340,75 L240,78 L150,82 L80,70 L55,45 Z" fill="#1b3854" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 중앙아시아 -->
+            <path d="M180,110 L260,100 L340,98 L410,105 L450,120 L455,148 L430,162 L380,168 L320,170 L265,168 L215,160 L185,145 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 몽골 -->
+            <path d="M430,72 L530,66 L620,68 L665,80 L675,105 L655,125 L600,132 L530,130 L460,128 L425,118 L420,95 Z" fill="#1b3a5a" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 중국 -->
+            <path d="M430,118 L520,112 L608,112 L660,125 L680,148 L675,182 L650,208 L610,222 L560,228 L510,224 L465,214 L440,195 L432,170 L425,145 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 한반도 -->
+            <path d="M658,143 L675,138 L688,148 L690,168 L678,182 L664,184 L654,172 L652,155 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 일본 혼슈 -->
+            <path d="M700,118 L722,112 L740,122 L748,142 L738,158 L720,160 L706,148 L698,132 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 일본 규슈·시코쿠 -->
+            <path d="M704,162 L720,158 L732,168 L728,182 L714,185 L704,175 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 대만 -->
+            <path d="M668,196 L678,192 L684,202 L680,214 L668,215 L662,205 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 중동 (터키~이란) -->
+            <path d="M100,190 L155,178 L215,175 L260,178 L295,192 L308,215 L300,238 L270,252 L228,258 L188,250 L148,235 L118,218 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 이란·파키스탄 -->
+            <path d="M250,175 L312,170 L368,178 L400,196 L405,222 L390,245 L355,255 L305,252 L270,245 L252,228 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 아라비아 반도 -->
+            <path d="M148,235 L188,250 L228,258 L252,280 L248,330 L228,365 L198,380 L165,372 L142,345 L136,305 L140,268 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 인도 -->
+            <path d="M340,168 L400,165 L438,182 L448,208 L442,252 L425,298 L400,335 L372,355 L348,350 L328,325 L318,285 L318,240 L328,210 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 방글라데시 -->
+            <path d="M428,210 L450,205 L460,220 L455,240 L438,244 L424,234 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 스리랑카 -->
+            <path d="M368,360 L380,356 L386,368 L380,378 L368,376 L362,365 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 동남아시아 본토 -->
+            <path d="M440,185 L488,178 L530,185 L546,208 L542,240 L522,265 L498,278 L472,275 L455,255 L445,228 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 인도차이나 -->
+            <path d="M492,240 L540,235 L572,250 L578,282 L562,320 L538,342 L510,338 L488,315 L482,282 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 말레이 반도 -->
+            <path d="M510,338 L538,342 L542,368 L530,395 L514,405 L500,392 L498,365 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 수마트라 -->
+            <path d="M460,362 L498,350 L538,352 L558,368 L548,392 L518,402 L484,398 L460,382 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 자바 -->
+            <path d="M502,402 L540,394 L578,396 L594,410 L572,424 L538,426 L504,418 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 보르네오 -->
+            <path d="M548,312 L588,302 L628,308 L645,332 L640,368 L618,388 L588,392 L558,375 L546,348 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 필리핀 -->
+            <path d="M634,232 L648,222 L660,232 L662,252 L648,262 L635,252 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <path d="M636,260 L648,255 L655,265 L650,280 L638,280 Z" fill="#1c3d5e" stroke="#264d6e" stroke-width="0.8"/>
+            <!-- 방위 -->
+            <text x="820" y="24" font-size="11" fill="rgba(79,195,247,0.45)" font-family="sans-serif">N ↑</text>
+            <!-- 지역 레이블 (흐릿하게) -->
+            <text x="545" y="95" font-size="10" fill="rgba(144,180,206,0.3)" font-family="sans-serif" text-anchor="middle">몽골</text>
+            <text x="558" y="178" font-size="11" fill="rgba(144,180,206,0.3)" font-family="sans-serif" text-anchor="middle">중국</text>
+            <text x="380" y="270" font-size="10" fill="rgba(144,180,206,0.3)" font-family="sans-serif" text-anchor="middle">인도</text>
+            <text x="190" y="310" font-size="9" fill="rgba(144,180,206,0.3)" font-family="sans-serif" text-anchor="middle">아라비아</text>
+            <text x="310" y="148" font-size="9" fill="rgba(144,180,206,0.3)" font-family="sans-serif" text-anchor="middle">중앙아시아</text>
+            <text x="510" y="310" font-size="9" fill="rgba(144,180,206,0.3)" font-family="sans-serif" text-anchor="middle">동남아시아</text>
+            <!-- 핀 레이어 -->
+            <g id="pins-layer"></g>
+            <!-- 클릭 마커 (빨간 원) -->
+            <circle id="click-marker" r="9" fill="rgba(255,82,82,0.75)" stroke="#fff" stroke-width="2" style="display:none"/>
+            <!-- 정답 마커 (초록 원) -->
+            <circle id="answer-marker" r="9" fill="rgba(105,240,174,0.85)" stroke="#fff" stroke-width="2" style="display:none"/>
+            <!-- 거리선 -->
+            <line id="dist-line" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-dasharray="6,4" style="display:none"/>
+          </svg>
+        </div>
+        <div style="margin-top:6px;font-size:11px;color:var(--text2);text-align:center;">지도를 클릭해 도시 위치를 찾아보세요 · 가까울수록 높은 점수!</div>
+      </div>
+      <div class="map-sidebar">
+        <div class="target-card">
+          <div class="target-label">📍 이 도시를 찾아라!</div>
+          <div class="target-city" id="target-city-name">-</div>
+          <div class="target-country" id="target-country-name">-</div>
+          <div class="target-hint" id="target-hint">-</div>
+        </div>
+        <div class="dist-result" id="dist-result">
+          <div class="dist-num" id="dist-num">-</div>
+          <div class="dist-label">오차 거리 (추정)</div>
+          <div class="dist-bar-wrap"><div class="dist-bar-fill" id="dist-bar" style="width:0%"></div></div>
+          <div class="dist-pts" id="dist-pts">-</div>
+        </div>
+        <div class="map-instruction" id="map-instruction">지도에서 해당 도시의 위치를 클릭하세요!<br>가까울수록 높은 점수를 얻어요.</div>
+        <button class="map-next-btn" id="map-next-btn" onclick="mapNext()">다음 도시 →</button>
+        <div class="map-rounds">
+          <div class="map-round-title">진행 상황</div>
+          <div class="round-dots" id="round-dots"></div>
+        </div>
       </div>
     </div>
-    <div class="quiz-card" style="margin-top:16px;">
-      <span class="quiz-type-badge" id="fill-badge">빈칸 채우기</span>
-      <div class="blank-question" id="fill-question"></div>
-      <div class="hint-tags" id="fill-hints"></div>
-    </div>
-    <div class="blank-input-wrap">
-      <input class="blank-input" type="text" id="fill-input" placeholder="답을 입력하세요..." onkeydown="if(event.key==='Enter')checkFill()">
-      <button class="blank-submit" onclick="checkFill()">확인</button>
-    </div>
-    <div class="feedback-box" id="fill-feedback"></div>
-    <button class="next-btn" id="fill-next" onclick="nextFill()">다음 문제 →</button>
   </div>
 
-  <!-- ══ RESULT ══ -->
+  <!-- RESULT -->
   <div class="screen" id="screen-result">
     <div class="result-screen">
       <div class="result-circle">
@@ -453,18 +322,9 @@
       <div class="result-title" id="res-title">결과</div>
       <div class="result-msg" id="res-msg"></div>
       <div class="result-grid">
-        <div class="result-stat">
-          <div class="result-stat-num" style="color:var(--green)" id="res-correct">0</div>
-          <div class="result-stat-label">정답</div>
-        </div>
-        <div class="result-stat">
-          <div class="result-stat-num" style="color:var(--red)" id="res-wrong">0</div>
-          <div class="result-stat-label">오답</div>
-        </div>
-        <div class="result-stat">
-          <div class="result-stat-num" style="color:var(--gold)" id="res-streak">0</div>
-          <div class="result-stat-label">최고 연속</div>
-        </div>
+        <div class="result-stat"><div class="result-stat-num" style="color:var(--green)" id="res-correct">0</div><div class="result-stat-label">정답</div></div>
+        <div class="result-stat"><div class="result-stat-num" style="color:var(--red)" id="res-wrong">0</div><div class="result-stat-label">오답</div></div>
+        <div class="result-stat"><div class="result-stat-num" style="color:var(--gold)" id="res-streak">0</div><div class="result-stat-label">최고연속</div></div>
       </div>
       <div class="btn-row">
         <button class="btn-primary" id="res-retry">다시 도전</button>
@@ -473,522 +333,307 @@
     </div>
   </div>
 
-</div><!-- /main -->
+</div>
 
 <script>
-// ══════════════════════════════════════════════
-// DATA
-// ══════════════════════════════════════════════
+// ═══════════════════════════
+// DATA  (SVG viewBox 860×560 기준 좌표)
+// ═══════════════════════════
 const cities = [
-  {
-    country: '우즈베키스탄', city: '사마르칸트', flag: '🇺🇿', region: '중앙아시아',
-    features: ['실크로드의 교역 통로', '다양한 이슬람 건축물', '아시아-유럽 교차점'],
-    emoji: '🏛️',
-    hint: '실크로드의 교역 중심지, 이슬람 건축물로 유명'
-  },
-  {
-    country: '인도', city: '뭄바이', flag: '🇮🇳', region: '남아시아',
-    features: ['매우 높은 인구 밀도', '발리우드: 영화 산업 중심지', '경제·금융 중심'],
-    emoji: '🎬',
-    hint: '발리우드 영화 산업의 중심지, 인도 경제 수도'
-  },
-  {
-    country: '아랍에미리트', city: '두바이', flag: '🇦🇪', region: '서남아시아',
-    features: ['사막 속의 첨단 도시', '석유를 기반으로 발전', '세계 최고층 건물 부르즈 할리파'],
-    emoji: '🏙️',
-    hint: '석유 자원으로 성장한 사막의 첨단 도시'
-  },
-  {
-    country: '싱가포르', city: '싱가포르', flag: '🇸🇬', region: '동남아시아',
-    features: ['세계적인 금융 중심지', '중국계·말레이계·인도계 다민족', '깔끔하고 질서있는 도시'],
-    emoji: '🦁',
-    hint: '다민족 공존의 깨끗한 도시국가, 세계 금융 허브'
-  },
-  {
-    country: '몽골', city: '울란바토르', flag: '🇲🇳', region: '동아시아',
-    features: ['초원의 수도', '대륙성 냉대기후', '유목 문화의 중심'],
-    emoji: '🐎',
-    hint: '광활한 초원의 나라, 대륙성 냉대기후 도시'
-  },
-  {
-    country: '이스라엘', city: '예루살렘', flag: '🇮🇱', region: '서남아시아',
-    features: ['유대교·이슬람교·기독교의 성지', '복잡한 정치 문제 존재', '이스라엘 vs 팔레스타인 분쟁'],
-    emoji: '✡️',
-    hint: '3대 종교의 성지, 이스라엘-팔레스타인 분쟁의 중심'
-  },
-  {
-    country: '베트남', city: '하롱베이', flag: '🇻🇳', region: '동남아시아',
-    features: ['유네스코 세계 자연유산', '석회암으로 이루어진 바위섬', '베트남의 대표 관광지'],
-    emoji: '⛵',
-    hint: '석회암 섬들이 펼쳐진 유네스코 세계자연유산'
-  },
-  {
-    country: '일본', city: '도쿄', flag: '🇯🇵', region: '동아시아',
-    features: ['아시아 최대 도시 중 하나', '세계의 정치·문화·경제에 큰 영향', '첨단 기술과 전통 문화 공존'],
-    emoji: '🗼',
-    hint: '세계 경제·문화 중심지, 도쿄 타워의 도시'
-  },
-  {
-    country: '방글라데시', city: '순다르반', flag: '🇧🇩', region: '남아시아',
-    features: ['세계 최대의 맹그로브 숲', '바닷물·민물이 만나는 해안 숲', '벵골호랑이·악어 등 희귀 동물 서식'],
-    emoji: '🐯',
-    hint: '세계 최대 맹그로브 숲, 벵골호랑이 서식지'
-  }
+  { country:'우즈베키스탄', city:'사마르칸트', flag:'🇺🇿', region:'중앙아시아',
+    sx:290, sy:152,
+    features:['실크로드의 교역 통로','다양한 이슬람 건축물','아시아-유럽 교차점'],
+    hint:'실크로드 교역 중심지. 중앙아시아 서쪽에 위치한 고대 도시' },
+  { country:'인도', city:'뭄바이', flag:'🇮🇳', region:'남아시아',
+    sx:348, sy:292,
+    features:['매우 높은 인구 밀도','발리우드: 영화 산업 중심지','인도 경제·금융 허브'],
+    hint:'인도 서쪽 해안에 위치. 발리우드 영화 산업의 중심지' },
+  { country:'아랍에미리트', city:'두바이', flag:'🇦🇪', region:'서남아시아',
+    sx:218, sy:292,
+    features:['사막 속 첨단 도시','석유를 기반으로 발전','세계 최고층 건물 위치'],
+    hint:'아라비아 반도 동쪽 해안에 위치. 석유로 성장한 사막의 첨단 도시' },
+  { country:'싱가포르', city:'싱가포르', flag:'🇸🇬', region:'동남아시아',
+    sx:516, sy:395,
+    features:['세계적인 금융 중심지','다민족(중국계·말레이계·인도계) 공존','깔끔하고 질서있는 도시국가'],
+    hint:'말레이 반도 최남단에 위치한 도시국가. 세계 금융·물류 허브' },
+  { country:'몽골', city:'울란바토르', flag:'🇲🇳', region:'동아시아',
+    sx:540, sy:98,
+    features:['초원의 수도','대륙성 냉대기후','유목 문화의 중심지'],
+    hint:'몽골 중앙에 위치. 광활한 초원과 혹독한 냉대기후를 가진 도시' },
+  { country:'이스라엘', city:'예루살렘', flag:'🇮🇱', region:'서남아시아',
+    sx:148, sy:228,
+    features:['유대교·이슬람교·기독교의 성지','이스라엘-팔레스타인 분쟁','복잡한 역사적 도시'],
+    hint:'지중해 동쪽 레반트 지역에 위치. 3대 종교 공통 성지' },
+  { country:'베트남', city:'하롱베이', flag:'🇻🇳', region:'동남아시아',
+    sx:568, sy:258,
+    features:['유네스코 세계 자연유산','석회암으로 이루어진 바위섬 군도','베트남 대표 관광지'],
+    hint:'베트남 북부 해안에 위치. 석회암 섬들이 펼쳐진 유네스코 자연유산' },
+  { country:'일본', city:'도쿄', flag:'🇯🇵', region:'동아시아',
+    sx:730, sy:155,
+    features:['아시아 최대 도시권 중 하나','세계 정치·문화·경제에 큰 영향','첨단 기술과 전통 문화 공존'],
+    hint:'일본 혼슈 동쪽에 위치. 세계 최대 규모 도시권 중 하나' },
+  { country:'방글라데시', city:'순다르반', flag:'🇧🇩', region:'남아시아',
+    sx:442, sy:252,
+    features:['세계 최대 맹그로브 숲','벵골호랑이·악어 등 희귀 동물 서식','유네스코 세계자연유산'],
+    hint:'방글라데시 남쪽 해안에 위치. 세계 최대의 맹그로브 숲' }
 ];
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════
 // STATE
-// ══════════════════════════════════════════════
-let totalScore = 0;
-let streak = 0;
-let bestStreak = 0;
-let currentMode = '';
+// ═══════════════════════════
+let totalScore=0, streak=0, bestStreak=0;
+let quizQs=[], quizIdx=0, quizCorrect=0, quizWrong=0, timerInt=null, timeLeft=15;
+let mapOrder=[], mapIdx=0, mapCorrect=0, mapWrong=0, mapClicked=false;
 
-// Quiz state
-let quizQuestions = [];
-let quizIndex = 0;
-let quizCorrect = 0;
-let quizWrong = 0;
-let timerInterval = null;
-let timeLeft = 15;
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen-'+id).classList.add('active'); }
+function updateHdr(){ document.getElementById('hdr-score').textContent=totalScore; document.getElementById('hdr-streak').textContent=streak; }
+function shuffle(a){ const b=[...a]; for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b; }
+function getRandom(arr,n){ return shuffle(arr).slice(0,n); }
 
-// Match state
-let matchSelected = null;
-let matchMatched = 0;
-let matchScore = 0;
-let matchWrong = 0;
-
-// Fill state
-let fillQuestions = [];
-let fillIndex = 0;
-let fillCorrect = 0;
-let fillWrong = 0;
-
-// ══════════════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════════════
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
-}
-function updateHeader() {
-  document.getElementById('hdr-score').textContent = totalScore;
-  document.getElementById('hdr-streak').textContent = streak;
-}
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-function getRandom(arr, n) {
-  return shuffle(arr).slice(0, n);
-}
-
-// ══════════════════════════════════════════════
+// ═══════════════════════════
 // CITY LIST
-// ══════════════════════════════════════════════
-function showCityList() {
+// ═══════════════════════════
+function showCityList(){
   showScreen('list');
-  const grid = document.getElementById('city-grid');
-  grid.innerHTML = cities.map(c => `
+  document.getElementById('city-grid').innerHTML=cities.map(c=>`
     <div class="city-card">
       <div class="city-flag">${c.flag}</div>
       <div class="city-country">${c.country}</div>
       <div class="city-name">${c.city}</div>
       <div class="city-tag">${c.region}</div>
-      <div style="margin-top:8px;font-size:11px;color:var(--text2);text-align:left;">
-        ${c.features.map(f => `• ${f}`).join('<br>')}
-      </div>
-    </div>
-  `).join('');
+      <div class="city-features">${c.features.map(f=>`• ${f}`).join('<br>')}</div>
+    </div>`).join('');
 }
 
-// ══════════════════════════════════════════════
-// QUIZ GAME
-// ══════════════════════════════════════════════
-function buildQuizQuestions() {
-  const qs = [];
-  cities.forEach(c => {
-    // Q1: country → city
-    const wrong1 = getRandom(cities.filter(x => x.city !== c.city), 3).map(x => x.city);
-    qs.push({
-      badge: '국가 → 도시',
-      question: `${c.flag} ${c.country}의 주요 도시는?`,
-      hint: c.hint,
-      answer: c.city,
-      options: shuffle([c.city, ...wrong1]),
-      explain: `${c.country}의 주요 도시는 ${c.city}입니다. ${c.features[0]}`
-    });
-    // Q2: hint → country
-    const wrong2 = getRandom(cities.filter(x => x.country !== c.country), 3).map(x => x.country);
-    qs.push({
-      badge: '특징 → 국가',
-      question: `"${c.features[0]}"에 해당하는 나라는?`,
-      hint: `지역: ${c.region}`,
-      answer: c.country,
-      options: shuffle([c.country, ...wrong2]),
-      explain: `정답은 ${c.flag} ${c.country}입니다. (도시: ${c.city})`
-    });
-    // Q3: feature → city
-    const wrong3 = getRandom(cities.filter(x => x.city !== c.city), 3).map(x => x.city);
-    qs.push({
-      badge: '특징 → 도시',
-      question: `"${c.features[1]}"로 유명한 도시는?`,
-      hint: `국가: ${c.country} ${c.flag}`,
-      answer: c.city,
-      options: shuffle([c.city, ...wrong3]),
-      explain: `${c.city}는 ${c.country}의 주요 도시입니다. ${c.features[1]}`
-    });
+// ═══════════════════════════
+// MAP GAME
+// ═══════════════════════════
+function startMapGame(){
+  mapOrder=shuffle(cities.map(c=>({...c})));
+  mapIdx=0; mapCorrect=0; mapWrong=0; streak=0;
+  showScreen('map');
+  // attach click
+  const svg=document.getElementById('asia-svg');
+  svg.onclick=mapClick;
+  buildRoundDots();
+  renderMapRound();
+}
+
+function buildRoundDots(){
+  document.getElementById('round-dots').innerHTML=mapOrder.map((_,i)=>
+    `<div class="round-dot" id="rd-${i}">${i+1}</div>`).join('');
+}
+
+function renderMapRound(){
+  const c=mapOrder[mapIdx];
+  mapClicked=false;
+  document.getElementById('map-round-label').textContent=`라운드 ${mapIdx+1} / ${mapOrder.length}`;
+  document.getElementById('target-city-name').textContent=c.city;
+  document.getElementById('target-country-name').textContent=c.flag+' '+c.country;
+  document.getElementById('target-hint').textContent=c.hint;
+  document.getElementById('dist-result').style.display='none';
+  document.getElementById('map-next-btn').style.display='none';
+  document.getElementById('map-instruction').innerHTML='지도에서 해당 도시의 위치를 클릭하세요!<br>가까울수록 높은 점수를 얻어요.';
+  hide('click-marker'); hide('answer-marker'); hide('dist-line');
+  refreshPins();
+  // dots
+  mapOrder.forEach((_,i)=>{
+    const d=document.getElementById('rd-'+i);
+    if(!d) return;
+    if(i<mapIdx) d.className='round-dot '+(mapOrder[i]._correct?'done-correct':'done-wrong');
+    else if(i===mapIdx) d.className='round-dot current';
+    else d.className='round-dot';
   });
-  return shuffle(qs).slice(0, 12);
 }
 
-function startQuiz() {
-  currentMode = 'quiz';
-  quizQuestions = buildQuizQuestions();
-  quizIndex = 0;
-  quizCorrect = 0;
-  quizWrong = 0;
-  streak = 0;
-  showScreen('quiz');
-  renderQuestion();
+function hide(id){ const el=document.getElementById(id); if(el){ el.style.display='none'; el.setAttribute('display','none'); } }
+function show(id){ const el=document.getElementById(id); if(el){ el.style.display=''; el.removeAttribute('display'); } }
+
+function svgPoint(e){
+  const svg=document.getElementById('asia-svg');
+  const rect=svg.getBoundingClientRect();
+  const vbW=860, vbH=560;
+  return { x:(e.clientX-rect.left)*(vbW/rect.width), y:(e.clientY-rect.top)*(vbH/rect.height) };
 }
 
-function renderQuestion() {
-  const q = quizQuestions[quizIndex];
-  const total = quizQuestions.length;
-  document.getElementById('q-badge').textContent = q.badge;
-  document.getElementById('q-text').textContent = q.question;
-  document.getElementById('q-hint').textContent = q.hint;
-  document.getElementById('q-count').textContent = `${quizIndex + 1} / ${total}`;
-  document.getElementById('q-progress').style.width = ((quizIndex / total) * 100) + '%';
-  document.getElementById('streak-display').textContent = `🔥 ${streak}연속`;
+function mapClick(e){
+  if(mapClicked) return;
+  mapClicked=true;
+  const {x,y}=svgPoint(e);
+  const c=mapOrder[mapIdx];
+  const dx=x-c.sx, dy=y-c.sy;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  // 1px ≈ 9.3km (아시아 동서 ~8000km / 860px)
+  const kmDist=Math.round(dist*9.3);
+  const isCorrect=dist<38;
+  const pts=Math.max(0,Math.round(50*(1-dist/90)));
 
-  const grid = document.getElementById('options-grid');
-  const letters = ['A', 'B', 'C', 'D'];
-  grid.innerHTML = q.options.map((opt, i) => `
-    <button class="option-btn" onclick="selectOption(this, '${opt.replace(/'/g, "\\'")}')">
-      <span class="option-letter">${letters[i]}</span>${opt}
-    </button>
-  `).join('');
+  c._answered=true; c._correct=isCorrect;
 
-  document.getElementById('feedback-box').style.display = 'none';
-  document.getElementById('next-btn').style.display = 'none';
+  // click marker
+  const cm=document.getElementById('click-marker');
+  cm.setAttribute('cx',x); cm.setAttribute('cy',y); show('click-marker');
+  // answer marker
+  const am=document.getElementById('answer-marker');
+  am.setAttribute('cx',c.sx); am.setAttribute('cy',c.sy); show('answer-marker');
+  // dist line
+  const dl=document.getElementById('dist-line');
+  dl.setAttribute('x1',x); dl.setAttribute('y1',y); dl.setAttribute('x2',c.sx); dl.setAttribute('y2',c.sy); show('dist-line');
+  // label on map
+  refreshPins();
+  addCityLabel(c, isCorrect);
+
+  totalScore+=pts;
+  if(isCorrect){ streak++; bestStreak=Math.max(bestStreak,streak); mapCorrect++; }
+  else { streak=0; mapWrong++; }
+
+  // result card
+  document.getElementById('dist-result').style.display='block';
+  document.getElementById('dist-num').textContent=kmDist.toLocaleString()+' km';
+  document.getElementById('dist-num').style.color=isCorrect?'var(--green)':(kmDist<800?'var(--gold)':'var(--red)');
+  const pct=Math.min(100,Math.round((dist/90)*100));
+  document.getElementById('dist-bar').style.width=(100-pct)+'%';
+  document.getElementById('dist-bar').style.background=isCorrect?'var(--green)':(pct<55?'var(--gold)':'var(--red)');
+  document.getElementById('dist-pts').textContent=isCorrect?`✅ 정답 근처! +${pts}점`:(pts>0?`△ 가깝지만... +${pts}점`:`❌ 너무 멀어요 +0점`);
+  document.getElementById('dist-pts').style.color=isCorrect?'var(--green)':(pts>0?'var(--gold)':'var(--red)');
+  document.getElementById('map-instruction').textContent=`정답: ${c.city} (${c.country}) — ${c.features[0]}`;
+  document.getElementById('map-next-btn').style.display='block';
+  document.getElementById('rd-'+mapIdx).className='round-dot '+(isCorrect?'done-correct':'done-wrong');
+  updateHdr();
+}
+
+function refreshPins(){
+  const layer=document.getElementById('pins-layer');
+  layer.innerHTML='';
+  mapOrder.forEach((c,i)=>{
+    if(i<mapIdx && c._answered){
+      const color=c._correct?'rgba(105,240,174,0.7)':'rgba(255,82,82,0.6)';
+      layer.innerHTML+=`<circle cx="${c.sx}" cy="${c.sy}" r="6" fill="${color}" stroke="#fff" stroke-width="1.5"/>
+        <text x="${c.sx}" y="${c.sy-9}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.65)" font-family="sans-serif">${c.city}</text>`;
+    }
+  });
+}
+
+function addCityLabel(c, isCorrect){
+  const layer=document.getElementById('pins-layer');
+  const color=isCorrect?'#69f0ae':'#ff8a80';
+  layer.innerHTML+=`<circle cx="${c.sx}" cy="${c.sy}" r="6" fill="${color}" stroke="#fff" stroke-width="1.5"/>
+    <text x="${c.sx}" y="${c.sy-10}" text-anchor="middle" font-size="9" font-weight="bold" fill="${color}" font-family="sans-serif">${c.city}</text>`;
+}
+
+function mapNext(){
+  mapIdx++;
+  if(mapIdx>=mapOrder.length) showResult('map');
+  else renderMapRound();
+}
+
+// ═══════════════════════════
+// QUIZ
+// ═══════════════════════════
+function buildQuizQs(){
+  const qs=[];
+  cities.forEach(c=>{
+    const w1=getRandom(cities.filter(x=>x.city!==c.city),3).map(x=>x.city);
+    qs.push({badge:'국가 → 도시', question:`${c.flag} ${c.country}의 주요 도시는?`, hint:c.hint, answer:c.city, options:shuffle([c.city,...w1]), explain:`${c.country}의 주요 도시는 ${c.city}입니다. ${c.features[0]}`});
+    const w2=getRandom(cities.filter(x=>x.country!==c.country),3).map(x=>x.country);
+    qs.push({badge:'특징 → 국가', question:`"${c.features[0]}"에 해당하는 나라는?`, hint:`지역: ${c.region}`, answer:c.country, options:shuffle([c.country,...w2]), explain:`정답은 ${c.flag} ${c.country}입니다. (도시: ${c.city})`});
+    const w3=getRandom(cities.filter(x=>x.city!==c.city),3).map(x=>x.city);
+    qs.push({badge:'특징 → 도시', question:`"${c.features[1]}"로 유명한 도시는?`, hint:`국가: ${c.country} ${c.flag}`, answer:c.city, options:shuffle([c.city,...w3]), explain:`${c.city}는 ${c.country}의 주요 도시입니다. ${c.features[1]}`});
+  });
+  return shuffle(qs).slice(0,12);
+}
+function startQuiz(){
+  quizQs=buildQuizQs(); quizIdx=0; quizCorrect=0; quizWrong=0; streak=0;
+  showScreen('quiz'); renderQuestion();
+}
+function renderQuestion(){
+  const q=quizQs[quizIdx], total=quizQs.length;
+  document.getElementById('q-badge').textContent=q.badge;
+  document.getElementById('q-text').textContent=q.question;
+  document.getElementById('q-hint').textContent=q.hint;
+  document.getElementById('q-count').textContent=`${quizIdx+1} / ${total}`;
+  document.getElementById('q-progress').style.width=((quizIdx/total)*100)+'%';
+  document.getElementById('streak-display').textContent=`🔥 ${streak}연속`;
+  const letters=['A','B','C','D'];
+  document.getElementById('options-grid').innerHTML=q.options.map((o,i)=>`
+    <button class="opt-btn" onclick="selectOpt(this,'${o.replace(/'/g,"\\'")}')">
+      <span class="opt-letter">${letters[i]}</span>${o}</button>`).join('');
+  document.getElementById('feedback-box').style.display='none';
+  document.getElementById('next-btn').style.display='none';
   startTimer();
 }
-
-function startTimer() {
-  clearInterval(timerInterval);
-  timeLeft = 15;
-  updateTimerUI(15, 15);
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    updateTimerUI(timeLeft, 15);
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      timeExpired();
-    }
-  }, 1000);
+function startTimer(){
+  clearInterval(timerInt); timeLeft=15; updateTimerUI(15,15);
+  timerInt=setInterval(()=>{ timeLeft--; updateTimerUI(timeLeft,15); if(timeLeft<=0){clearInterval(timerInt);timeExpired();} },1000);
 }
-
-function updateTimerUI(t, max) {
-  const circ = document.getElementById('timer-circle');
-  const num = document.getElementById('timer-num');
-  const len = 125.6;
-  circ.style.strokeDashoffset = len * (1 - t / max);
-  circ.style.stroke = t <= 5 ? '#ff5252' : '#4fc3f7';
-  num.textContent = t;
-  num.className = 'timer-num' + (t <= 5 ? ' urgent' : '');
+function updateTimerUI(t,max){
+  const c=document.getElementById('timer-circle'), n=document.getElementById('timer-num'), len=113.1;
+  c.style.strokeDashoffset=len*(1-t/max); c.style.stroke=t<=5?'#ff5252':'#4fc3f7';
+  n.textContent=t; n.className='timer-num'+(t<=5?' urgent':'');
 }
-
-function timeExpired() {
-  const q = quizQuestions[quizIndex];
-  streak = 0;
-  quizWrong++;
-  document.querySelectorAll('.option-btn').forEach(btn => {
-    btn.disabled = true;
-    if (btn.textContent.includes(q.answer)) btn.classList.add('correct');
-  });
-  showFeedback(false, `⏰ 시간 초과! 정답: <strong>${q.answer}</strong><br>${q.explain}`);
-  updateHeader();
+function timeExpired(){
+  const q=quizQs[quizIdx]; streak=0; quizWrong++;
+  document.querySelectorAll('.opt-btn').forEach(b=>{ b.disabled=true; if(b.textContent.trim().includes(q.answer))b.classList.add('correct'); });
+  showFeedback(false,`⏰ 시간 초과! 정답: <strong>${q.answer}</strong><br>${q.explain}`);
+  updateHdr();
 }
-
-function selectOption(btn, selected) {
-  clearInterval(timerInterval);
-  const q = quizQuestions[quizIndex];
-  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
-
-  if (selected === q.answer) {
+function selectOpt(btn,sel){
+  clearInterval(timerInt);
+  const q=quizQs[quizIdx];
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  if(sel===q.answer){
     btn.classList.add('correct');
-    streak++;
-    bestStreak = Math.max(bestStreak, streak);
-    const bonus = Math.min(streak, 5) * 5;
-    const timeBonus = Math.floor(timeLeft * 2);
-    const pts = 10 + bonus + timeBonus;
-    totalScore += pts;
-    quizCorrect++;
-    showFeedback(true, `✅ 정답! <strong>+${pts}점</strong> (시간보너스 +${timeBonus}, 연속보너스 +${bonus})<br>${q.explain}`);
+    streak++; bestStreak=Math.max(bestStreak,streak);
+    const bonus=Math.min(streak,5)*5, tb=Math.floor(timeLeft*2), pts=10+bonus+tb;
+    totalScore+=pts; quizCorrect++;
+    showFeedback(true,`✅ 정답! <strong>+${pts}점</strong> (시간보너스 +${tb}, 연속 +${bonus})<br>${q.explain}`);
   } else {
     btn.classList.add('wrong');
-    document.querySelectorAll('.option-btn').forEach(b => {
-      if (b.textContent.includes(q.answer)) b.classList.add('correct');
-    });
-    streak = 0;
-    quizWrong++;
-    showFeedback(false, `❌ 오답! 정답은 <strong>${q.answer}</strong><br>${q.explain}`);
+    document.querySelectorAll('.opt-btn').forEach(b=>{ if(b.textContent.trim().includes(q.answer))b.classList.add('correct'); });
+    streak=0; quizWrong++;
+    showFeedback(false,`❌ 오답! 정답은 <strong>${q.answer}</strong><br>${q.explain}`);
   }
-  document.getElementById('streak-display').textContent = `🔥 ${streak}연속`;
-  updateHeader();
+  updateHdr();
+}
+function showFeedback(ok,msg){
+  const fb=document.getElementById('feedback-box');
+  fb.className='feedback-box '+(ok?'correct':'wrong');
+  fb.innerHTML=msg; fb.style.display='block';
+  document.getElementById('next-btn').style.display='block';
+}
+function nextQuestion(){
+  quizIdx++;
+  if(quizIdx>=quizQs.length) showResult('quiz'); else renderQuestion();
 }
 
-function showFeedback(correct, msg) {
-  const fb = document.getElementById('feedback-box');
-  fb.className = 'feedback-box ' + (correct ? 'correct' : 'wrong');
-  fb.innerHTML = msg;
-  fb.style.display = 'block';
-  document.getElementById('next-btn').style.display = 'block';
-}
-
-function nextQuestion() {
-  quizIndex++;
-  if (quizIndex >= quizQuestions.length) {
-    showResult('quiz');
-  } else {
-    renderQuestion();
-  }
-}
-
-// ══════════════════════════════════════════════
-// MATCHING GAME
-// ══════════════════════════════════════════════
-function startMatching() {
-  currentMode = 'match';
-  matchSelected = null;
-  matchMatched = 0;
-  matchScore = 0;
-  matchWrong = 0;
-  showScreen('match');
-
-  const shuffledCountries = shuffle(cities);
-  const shuffledCities = shuffle(cities);
-
-  const cDiv = document.getElementById('match-countries');
-  const ciDiv = document.getElementById('match-cities');
-
-  cDiv.innerHTML = shuffledCountries.map(c => `
-    <div class="match-item" id="mc-${c.country}" onclick="matchClick('country','${c.country}')">
-      ${c.flag} ${c.country}
-    </div>
-  `).join('');
-
-  ciDiv.innerHTML = shuffledCities.map(c => `
-    <div class="match-item" id="mci-${c.city}" onclick="matchClick('city','${c.city}')">
-      ${c.city}
-    </div>
-  `).join('');
-
-  document.getElementById('match-prog').textContent = `0 / ${cities.length} 완료`;
-  document.getElementById('match-feedback').textContent = '국가를 먼저 선택한 후 도시를 선택하세요';
-}
-
-function matchClick(type, val) {
-  if (!matchSelected) {
-    if (type !== 'country') { 
-      document.getElementById('match-feedback').textContent = '국가를 먼저 선택하세요!';
-      return;
-    }
-    matchSelected = { type, val };
-    document.getElementById('mc-' + val).classList.add('selected');
-    document.getElementById('match-feedback').textContent = `${val} 선택됨 → 해당 도시를 클릭하세요`;
-  } else {
-    if (type !== 'city') {
-      // re-select country
-      document.querySelectorAll('.match-item.selected').forEach(el => el.classList.remove('selected'));
-      matchSelected = { type, val };
-      document.getElementById('mc-' + val).classList.add('selected');
-      document.getElementById('match-feedback').textContent = `${val} 선택됨 → 해당 도시를 클릭하세요`;
-      return;
-    }
-    const selCountry = matchSelected.val;
-    document.getElementById('mc-' + selCountry).classList.remove('selected');
-    matchSelected = null;
-
-    const correct = cities.find(c => c.country === selCountry);
-    if (correct && correct.city === val) {
-      // correct
-      document.getElementById('mc-' + selCountry).classList.add('matched');
-      document.getElementById('mci-' + val).classList.add('matched');
-      document.getElementById('mc-' + selCountry).onclick = null;
-      document.getElementById('mci-' + val).onclick = null;
-      matchMatched++;
-      matchScore += 15;
-      totalScore += 15;
-      streak++;
-      bestStreak = Math.max(bestStreak, streak);
-      document.getElementById('match-feedback').textContent = `✅ 정답! ${selCountry} - ${val}`;
-      document.getElementById('match-prog').textContent = `${matchMatched} / ${cities.length} 완료`;
-      updateHeader();
-      if (matchMatched === cities.length) {
-        setTimeout(() => showResult('match'), 600);
-      }
-    } else {
-      // wrong
-      matchWrong++;
-      streak = 0;
-      const cEl = document.getElementById('mc-' + selCountry);
-      const ciEl = document.getElementById('mci-' + val);
-      cEl.classList.add('wrong-flash');
-      ciEl.classList.add('wrong-flash');
-      document.getElementById('match-feedback').textContent = `❌ 틀렸어요! ${selCountry}의 도시를 다시 찾아보세요`;
-      setTimeout(() => { cEl.classList.remove('wrong-flash'); ciEl.classList.remove('wrong-flash'); }, 600);
-      updateHeader();
-    }
-  }
-}
-
-// ══════════════════════════════════════════════
-// FILL BLANK
-// ══════════════════════════════════════════════
-function buildFillQuestions() {
-  return shuffle(cities.map(c => {
-    const askCity = Math.random() > 0.5;
-    return {
-      question: askCity
-        ? `다음 특징을 가진 ${c.country}의 주요 도시는?\n\n"${c.hint}"`
-        : `다음 도시 ${c.city}가 속한 나라는?\n\n"${c.hint}"`,
-      answer: askCity ? c.city : c.country,
-      answerAlt: askCity ? [c.city] : [c.country],
-      hints: c.features,
-      badge: askCity ? '도시 이름 쓰기' : '국가 이름 쓰기',
-      explain: `${c.flag} ${c.country} - ${c.city}: ${c.features.join(', ')}`
-    };
-  }));
-}
-
-function startFillBlank() {
-  currentMode = 'fill';
-  fillQuestions = buildFillQuestions();
-  fillIndex = 0;
-  fillCorrect = 0;
-  fillWrong = 0;
-  streak = 0;
-  showScreen('fill');
-  renderFill();
-}
-
-function renderFill() {
-  const q = fillQuestions[fillIndex];
-  const total = fillQuestions.length;
-  document.getElementById('fill-badge').textContent = q.badge;
-  document.getElementById('fill-question').textContent = q.question;
-  document.getElementById('fill-count').textContent = `${fillIndex + 1} / ${total}`;
-  document.getElementById('fill-progress').style.width = ((fillIndex / total) * 100) + '%';
-  document.getElementById('fill-feedback').style.display = 'none';
-  document.getElementById('fill-next').style.display = 'none';
-  document.getElementById('fill-input').value = '';
-  document.getElementById('fill-input').disabled = false;
-  document.getElementById('fill-input').focus();
-
-  const hintsDiv = document.getElementById('fill-hints');
-  hintsDiv.innerHTML = q.hints.map((h, i) => `<span class="hint-tag" onclick="useHint(${i})">힌트 ${i+1} 보기</span>`).join('');
-}
-
-function useHint(i) {
-  const q = fillQuestions[fillIndex];
-  const tags = document.querySelectorAll('.hint-tag');
-  tags[i].textContent = q.hints[i];
-  tags[i].style.color = 'var(--accent)';
-  tags[i].style.background = 'rgba(79,195,247,0.15)';
-  tags[i].onclick = null;
-}
-
-function checkFill() {
-  const q = fillQuestions[fillIndex];
-  const input = document.getElementById('fill-input');
-  const val = input.value.trim();
-  if (!val) return;
-  input.disabled = true;
-
-  const correct = q.answerAlt.some(a => a === val) || val === q.answer;
-  const fb = document.getElementById('fill-feedback');
-
-  if (correct) {
-    fb.className = 'feedback-box correct';
-    fb.innerHTML = `✅ 정답! <strong>+15점</strong><br>${q.explain}`;
-    fillCorrect++;
-    streak++;
-    bestStreak = Math.max(bestStreak, streak);
-    totalScore += 15;
-    input.style.borderColor = 'var(--green)';
-  } else {
-    fb.className = 'feedback-box wrong';
-    fb.innerHTML = `❌ 오답! 정답은 <strong>${q.answer}</strong><br>${q.explain}`;
-    fillWrong++;
-    streak = 0;
-    input.style.borderColor = 'var(--red)';
-  }
-  fb.style.display = 'block';
-  document.getElementById('fill-next').style.display = 'block';
-  updateHeader();
-}
-
-function nextFill() {
-  document.getElementById('fill-input').style.borderColor = '';
-  fillIndex++;
-  if (fillIndex >= fillQuestions.length) {
-    showResult('fill');
-  } else {
-    renderFill();
-  }
-}
-
-// ══════════════════════════════════════════════
+// ═══════════════════════════
 // RESULT
-// ══════════════════════════════════════════════
-function showResult(mode) {
-  clearInterval(timerInterval);
-  showScreen('result');
-  let correct, wrong, maxScore;
-  if (mode === 'quiz') {
-    correct = quizCorrect; wrong = quizWrong; maxScore = quizQuestions.length * 30;
-  } else if (mode === 'match') {
-    correct = matchMatched; wrong = matchWrong; maxScore = cities.length * 15;
-  } else {
-    correct = fillCorrect; wrong = fillWrong; maxScore = fillQuestions.length * 15;
-  }
-
-  const pct = maxScore ? Math.round((totalScore / maxScore) * 100) : 0;
-  document.getElementById('res-score').textContent = totalScore;
-  document.getElementById('res-total').textContent = `/ ${maxScore}점`;
-  document.getElementById('res-correct').textContent = correct;
-  document.getElementById('res-wrong').textContent = wrong;
-  document.getElementById('res-streak').textContent = bestStreak;
-
-  let title, msg;
-  if (pct >= 90) { title = '🏆 완벽해요!'; msg = '아시아 도시 박사! 모든 국가와 도시를 완벽하게 알고 있네요.'; }
-  else if (pct >= 70) { title = '🌟 훌륭해요!'; msg = '아시아 지리를 잘 이해하고 있어요. 조금 더 연습하면 완벽해질 거예요!'; }
-  else if (pct >= 50) { title = '📚 잘했어요!'; msg = '기본은 알고 있어요. 틀린 문제를 다시 복습해 보세요.'; }
-  else { title = '💪 다시 도전!'; msg = '도시 카드를 먼저 학습하고 다시 도전해 보세요. 할 수 있어요!'; }
-
-  document.getElementById('res-title').textContent = title;
-  document.getElementById('res-msg').textContent = msg;
-
-  const retryBtn = document.getElementById('res-retry');
-  retryBtn.onclick = () => {
-    totalScore = 0; streak = 0; bestStreak = 0; updateHeader();
-    if (mode === 'quiz') startQuiz();
-    else if (mode === 'match') startMatching();
-    else startFillBlank();
+// ═══════════════════════════
+function showResult(mode){
+  clearInterval(timerInt); showScreen('result');
+  let correct,wrong,maxScore;
+  if(mode==='quiz'){ correct=quizCorrect; wrong=quizWrong; maxScore=quizQs.length*30; }
+  else { correct=mapCorrect; wrong=mapWrong; maxScore=mapOrder.length*50; }
+  const pct=maxScore?Math.round((totalScore/maxScore)*100):0;
+  document.getElementById('res-score').textContent=totalScore;
+  document.getElementById('res-total').textContent=`/ ${maxScore}점`;
+  document.getElementById('res-correct').textContent=correct;
+  document.getElementById('res-wrong').textContent=wrong;
+  document.getElementById('res-streak').textContent=bestStreak;
+  let title,msg;
+  if(pct>=85){title='🏆 완벽해요!';msg='아시아 지리 전문가! 모든 위치를 훌륭하게 알고 있어요.';}
+  else if(pct>=65){title='🌟 훌륭해요!';msg='아시아 지리를 잘 이해하고 있어요. 조금 더 연습하면 완벽해요!';}
+  else if(pct>=40){title='📚 잘했어요!';msg='기본은 알고 있어요. 도시 카드로 복습 후 다시 도전해 보세요!';}
+  else{title='💪 다시 도전!';msg='도시 카드를 먼저 학습하고 다시 도전해 보세요. 할 수 있어요!';}
+  document.getElementById('res-title').textContent=title;
+  document.getElementById('res-msg').textContent=msg;
+  document.getElementById('res-retry').onclick=()=>{
+    totalScore=0; streak=0; bestStreak=0; updateHdr();
+    if(mode==='map') startMapGame(); else startQuiz();
   };
 }
 
-// ══════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════
-updateHeader();
+updateHdr();
 </script>
 </body>
 </html>
