@@ -4,1210 +4,1047 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌏 아시아 탐험 여행 - 국가 위치 학습</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Jua', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #fff6e5 0%, #ffe4ec 50%, #e4f0ff 100%);
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* 시작 화면 */
         .start-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s, visibility 0.5s;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 2000;
         }
+        .start-screen.hidden { display: none; }
 
-        .start-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .start-title {
-            font-size: 2.5rem;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(255, 200, 100, 0.5);
+        .start-title { 
+            font-size: 3rem; 
+            color: #5d4e6d; 
+            text-shadow: 3px 3px 0 #fff;
             margin-bottom: 10px;
-            text-align: center;
         }
-
-        .start-subtitle {
-            font-size: 1.2rem;
-            color: #ffd700;
-            margin-bottom: 40px;
+        .start-subtitle { 
+            font-size: 1.3rem; 
+            color: #ff6b6b;
+            margin-bottom: 30px;
         }
-
-        .airplane-icon {
-            font-size: 4rem;
-            animation: fly 2s ease-in-out infinite;
+        .mascot {
+            font-size: 5rem;
+            animation: bounce 1s ease-in-out infinite;
         }
-
-        @keyframes fly {
-            0%, 100% { transform: translateY(0) rotate(-5deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
 
         .input-group {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.9);
             padding: 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
             width: 90%;
             max-width: 400px;
+            box-shadow: 0 10px 40px rgba(255,150,150,0.3);
         }
-
-        .input-group label {
-            display: block;
-            color: #fff;
+        .input-group label { 
+            display: block; 
+            color: #5d4e6d; 
             margin-bottom: 8px;
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
-
-        .input-group input {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+        .input-group input { 
+            width: 100%; 
+            padding: 15px 20px; 
+            border: 3px solid #ffc3a0;
+            border-radius: 15px; 
+            font-size: 1rem; 
             margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Jua', sans-serif;
+            outline: none;
         }
-
+        .input-group input:focus { border-color: #ff6b6b; }
         .start-btn {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 18px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
             border: none;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .start-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);
-        }
-
-        /* 메인 컨테이너 */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* 헤더 */
-        .header {
-            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
-            padding: 20px 30px;
-            margin-bottom: 20px;
+            color: #fff;
+            font-size: 1.4rem;
+            font-family: 'Jua', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255,150,150,0.4);
+            transition: transform 0.3s;
+        }
+        .start-btn:hover { transform: translateY(-5px) scale(1.02); }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 15px; }
+
+        .header {
+            background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
+            border-radius: 25px;
+            padding: 18px 30px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-left h1 {
-            font-size: 1.5rem;
-            color: #333;
-        }
-
-        .header-left p {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .user-info {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: bold;
-        }
-
-        /* 탭 메뉴 */
-        .tab-menu {
-            display: flex;
             gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 3px solid #ffd1dc;
+        }
+        .header h1 { font-size: 1.6rem; color: #5d4e6d; display: flex; align-items: center; gap: 10px; }
+        .header p { color: #888; font-size: 0.9rem; }
+        .user-info { 
+            background: linear-gradient(135deg, #a8e6cf 0%, #88d8b0 100%);
+            color: #2d5a4a;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
         }
 
+        .tab-menu { display: flex; gap: 12px; margin-bottom: 15px; }
         .tab-btn {
             flex: 1;
-            min-width: 150px;
             padding: 15px 25px;
-            border: none;
-            border-radius: 15px;
-            font-size: 1rem;
-            font-weight: bold;
+            border: 3px solid transparent;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-family: 'Jua', sans-serif;
             cursor: pointer;
             transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
+        .tab-btn.study { background: #fff; color: #ff9a9e; border-color: #ffd1dc; }
+        .tab-btn.study.active { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); color: #fff; border-color: transparent; }
+        .tab-btn.quiz { background: #f0f0f0; color: #aaa; cursor: not-allowed; }
+        .tab-btn.quiz.unlocked { background: #fff; color: #74b9ff; border-color: #a8d8ff; cursor: pointer; }
+        .tab-btn.quiz.active { background: linear-gradient(135deg, #74b9ff 0%, #a8d8ff 100%); color: #fff; border-color: transparent; }
+        .tab-btn.quiz.used { background: #e8e8e8; color: #888; }
 
-        .tab-btn.study {
-            background: #fff;
-            color: #667eea;
-        }
+        .main-content { display: grid; grid-template-columns: 1fr 300px; gap: 15px; }
+        @media (max-width: 1000px) { .main-content { grid-template-columns: 1fr; } }
 
-        .tab-btn.study.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-        }
-
-        .tab-btn.quiz {
-            background: #e0e0e0;
-            color: #999;
-            cursor: not-allowed;
-        }
-
-        .tab-btn.quiz.unlocked {
-            background: #fff;
-            color: #f5576c;
-            cursor: pointer;
-        }
-
-        .tab-btn.quiz.active {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: #fff;
-        }
-
-        .lock-icon {
-            font-size: 1.2rem;
-        }
-
-        /* 메인 콘텐츠 */
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 20px;
-        }
-
-        @media (max-width: 1000px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* 지도 영역 */
         .map-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
+            background: #fff;
+            border-radius: 25px;
             padding: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             position: relative;
-            min-height: 500px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            border: 3px solid #ffd1dc;
         }
-
         .map-title {
             text-align: center;
-            font-size: 1.3rem;
-            color: #333;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 2px dashed #ddd;
-        }
-
-        .map-wrapper {
-            position: relative;
-            width: 100%;
-            overflow: auto;
-        }
-
-        .asia-map {
-            width: 100%;
-            min-width: 600px;
-            height: auto;
-        }
-
-        .country {
-            fill: #e8f4f8;
-            stroke: #4a90a4;
-            stroke-width: 1;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .country:hover {
-            fill: #b3d9e8;
-            stroke-width: 2;
-        }
-
-        .country.learned {
-            fill: #a8e6cf;
-        }
-
-        .country.selected {
-            fill: #ffd93d;
-            stroke: #ff6b6b;
-            stroke-width: 3;
-        }
-
-        .country.correct {
-            fill: #6bcb77;
-            animation: pulse 0.5s;
-        }
-
-        .country.wrong {
-            fill: #ff6b6b;
-            animation: shake 0.5s;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .country-label {
-            font-size: 8px;
-            fill: #333;
-            pointer-events: none;
-            font-weight: bold;
-        }
-
-        /* 사이드 패널 */
-        .side-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .info-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .info-card h3 {
             font-size: 1.2rem;
-            color: #333;
+            color: #5d4e6d;
             margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
+            padding-bottom: 12px;
+            border-bottom: 3px dashed #ffd1dc;
         }
 
-        .country-info {
-            text-align: center;
-            padding: 20px 0;
+        #map { width: 100%; height: 500px; border-radius: 20px; background: #fef9f3; }
+
+        .quiz-overlay {
+            position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, #74b9ff 0%, #a8d8ff 100%);
+            color: #fff; padding: 20px 40px; border-radius: 25px; text-align: center;
+            z-index: 1000; display: none; box-shadow: 0 8px 30px rgba(116,185,255,0.4);
         }
+        .quiz-overlay.active { display: block; }
+        .quiz-overlay h3 { font-size: 1rem; margin-bottom: 8px; opacity: 0.9; }
+        .quiz-overlay .country-name { font-size: 2rem; }
 
-        .country-info .flag {
-            font-size: 3rem;
-            margin-bottom: 10px;
+        .result-overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #fff; padding: 40px; border-radius: 30px; text-align: center;
+            z-index: 1000; display: none; min-width: 320px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.2); border: 4px solid #ffd1dc;
         }
+        .result-overlay.show { display: block; }
+        .result-overlay h2 { font-size: 1.8rem; color: #5d4e6d; margin-bottom: 15px; }
+        .result-overlay .score { font-size: 3rem; color: #ff6b6b; margin: 10px 0; }
+        .result-overlay .grade { display: inline-block; padding: 10px 30px; border-radius: 20px; margin: 15px 0; font-size: 1.2rem; }
+        .grade.excellent { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #d35400; }
+        .grade.good { background: linear-gradient(135deg, #a8e6cf 0%, #88d8b0 100%); color: #27ae60; }
+        .grade.average { background: linear-gradient(135deg, #74b9ff 0%, #a8d8ff 100%); color: #2980b9; }
+        .grade.needwork { background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); color: #d68910; }
 
-        .country-info .name {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
+        .result-btn {
+            padding: 12px 30px; border: none; border-radius: 15px;
+            font-size: 1rem; font-family: 'Jua', sans-serif; cursor: pointer; margin: 5px; transition: transform 0.2s;
         }
+        .result-btn:hover { transform: scale(1.05); }
+        .result-btn.primary { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); color: #fff; }
+        .result-btn.secondary { background: #f0f0f0; color: #666; }
+        .result-btn.retry { background: linear-gradient(135deg, #74b9ff 0%, #a8d8ff 100%); color: #fff; }
 
-        .country-info .capital {
-            color: #666;
-            margin-bottom: 15px;
-        }
-
-        .country-info .description {
-            text-align: left;
-            font-size: 0.9rem;
-            color: #555;
-            line-height: 1.6;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .progress-section h4 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .progress-bar {
-            background: #e0e0e0;
-            border-radius: 10px;
-            height: 20px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .progress-fill {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100%;
-            transition: width 0.5s;
-            border-radius: 10px;
-        }
-
-        .progress-text {
-            text-align: center;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        /* 퀴즈 영역 */
-        .quiz-section {
-            display: none;
-        }
-
-        .quiz-section.active {
-            display: block;
-        }
-
-        .study-section {
-            display: block;
-        }
-
-        .study-section.hidden {
-            display: none;
-        }
-
-        .quiz-question {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .quiz-question h2 {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-        }
-
-        .quiz-question .country-name {
-            font-size: 2rem;
-            font-weight: bold;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .quiz-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .stat-box {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-box .number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .stat-box .label {
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        .quiz-result {
-            display: none;
-            text-align: center;
-            padding: 30px;
-        }
-
-        .quiz-result.show {
-            display: block;
-        }
-
-        .quiz-result h2 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-        }
-
-        .quiz-result .score {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .retry-btn {
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .retry-btn:hover {
-            transform: translateY(-3px);
-        }
-
-        /* 국가 목록 */
-        .country-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .country-chip {
-            background: #f0f0f0;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .country-chip:hover {
-            background: #667eea;
-            color: #fff;
-        }
-
-        .country-chip.learned {
-            background: #a8e6cf;
-            color: #333;
-        }
-
-        /* 성취기준 */
-        .standard-box {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            border-radius: 0 10px 10px 0;
-            margin-top: 15px;
-        }
-
-        .standard-box h4 {
-            color: #667eea;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-        }
-
-        .standard-box p {
-            font-size: 0.85rem;
-            color: #555;
-            line-height: 1.5;
-        }
-
-        /* 반응형 */
-        @media (max-width: 768px) {
-            .start-title {
-                font-size: 1.8rem;
-            }
-
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .map-container {
-                min-height: 400px;
-            }
-
-            .quiz-stats {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* 스크롤바 스타일 */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 10px;
-        }
-
-        /* 알림 메시지 */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 10px;
-            color: #fff;
-            font-weight: bold;
-            z-index: 2000;
-            transform: translateX(400px);
-            transition: transform 0.3s;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.success {
-            background: linear-gradient(135deg, #6bcb77 0%, #4ade80 100%);
-        }
-
-        .notification.error {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
-        }
-
-        .notification.info {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        /* 힌트 버튼 */
         .hint-btn {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background: #ffd93d;
-            border: none;
-            border-radius: 25px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: transform 0.3s;
+            position: absolute; bottom: 30px; right: 30px; padding: 12px 25px;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border: none; border-radius: 20px; font-family: 'Jua', sans-serif;
+            font-size: 1rem; cursor: pointer; z-index: 1000; display: none;
+            box-shadow: 0 4px 15px rgba(253,203,110,0.4);
         }
-
-        .hint-btn:hover {
-            transform: scale(1.05);
-        }
-
         .hint-text {
-            position: absolute;
-            bottom: 70px;
-            right: 20px;
-            background: #333;
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            display: none;
+            position: absolute; bottom: 85px; right: 30px; background: #5d4e6d;
+            color: #fff; padding: 12px 20px; border-radius: 15px;
+            z-index: 1000; display: none; font-size: 0.95rem;
+        }
+        .hint-text.show { display: block; }
+
+        .legend {
+            position: absolute; bottom: 30px; left: 30px; background: rgba(255,255,255,0.95);
+            padding: 15px 20px; border-radius: 15px; z-index: 1000; font-size: 0.85rem; border: 2px solid #ffd1dc;
+        }
+        .legend-item { display: flex; align-items: center; gap: 10px; margin: 5px 0; color: #5d4e6d; }
+        .legend-color { width: 20px; height: 14px; border-radius: 4px; border: 1px solid #ccc; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; background: #e74c3c; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+
+        .side-panel { display: flex; flex-direction: column; gap: 15px; }
+        .info-card {
+            background: #fff; border-radius: 25px; padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08); border: 3px solid #ffd1dc;
+        }
+        .info-card h3 {
+            font-size: 1.1rem; color: #5d4e6d; margin-bottom: 12px;
+            padding-bottom: 10px; border-bottom: 3px solid #ffecd2;
+            display: flex; align-items: center; gap: 8px;
         }
 
-        .hint-text.show {
-            display: block;
+        .country-info { text-align: center; padding: 15px 0; }
+        .country-info .flag { font-size: 3rem; }
+        .country-info .name { font-size: 1.4rem; color: #5d4e6d; margin: 8px 0; }
+        .country-info .capital { 
+            color: #e74c3c; font-size: 1.1rem;
+            background: #fff5f5; padding: 8px 15px; border-radius: 10px; display: inline-block;
+        }
+        .country-info .desc { 
+            text-align: left; font-size: 0.95rem; color: #666;
+            background: #fef9f3; padding: 15px; border-radius: 15px; margin-top: 12px; line-height: 1.5;
+        }
+
+        .progress-bar { background: #f0f0f0; border-radius: 15px; height: 20px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); height: 100%; transition: width 0.5s; border-radius: 15px; }
+        .progress-text { text-align: center; color: #888; font-size: 0.95rem; }
+
+        .quiz-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .stat-box {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            padding: 15px; border-radius: 15px; text-align: center; border: 2px solid #e0e0e0;
+        }
+        .stat-box .number { font-size: 1.5rem; color: #5d4e6d; }
+        .stat-box .label { font-size: 0.8rem; color: #888; }
+
+        .country-list { display: flex; flex-wrap: wrap; gap: 8px; max-height: 150px; overflow-y: auto; }
+        .country-chip {
+            background: #fef9f3; padding: 8px 14px; border-radius: 20px;
+            font-size: 0.85rem; cursor: pointer; border: 2px solid #ffecd2;
+            transition: all 0.2s; color: #5d4e6d;
+        }
+        .country-chip:hover { background: #ff9a9e; color: #fff; border-color: #ff9a9e; }
+        .country-chip.learned { background: #a8e6cf; border-color: #88d8b0; color: #2d5a4a; }
+
+        .notification {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            padding: 15px 35px; border-radius: 25px; color: #fff; font-size: 1.1rem;
+            z-index: 3000; opacity: 0; transition: opacity 0.3s; box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        }
+        .notification.show { opacity: 1; }
+        .notification.success { background: linear-gradient(135deg, #a8e6cf 0%, #88d8b0 100%); color: #2d5a4a; }
+        .notification.error { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); color: #fff; }
+        .notification.info { background: linear-gradient(135deg, #74b9ff 0%, #a8d8ff 100%); }
+
+        .celebration { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2500; display: none; }
+        .celebration.active { display: block; }
+        .confetti { position: absolute; animation: fall 1.5s forwards; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+
+        .teacher-btn {
+            position: fixed; bottom: 20px; left: 20px; padding: 10px 20px;
+            background: rgba(93,78,109,0.7); color: #fff; border: none;
+            border-radius: 20px; cursor: pointer; font-family: 'Jua', sans-serif;
+        }
+
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 3000;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: #fff; padding: 30px; border-radius: 25px;
+            max-width: 500px; width: 90%; max-height: 70vh; overflow-y: auto; border: 3px solid #ffd1dc;
+        }
+        .modal-content h2 { color: #5d4e6d; margin-bottom: 20px; }
+        .modal-close {
+            margin-top: 20px; padding: 12px 30px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: #fff; border: none; border-radius: 15px; cursor: pointer; font-family: 'Jua', sans-serif;
+        }
+
+        .leaflet-container { background: #fef9f3 !important; }
+        .leaflet-interactive { cursor: pointer !important; }
+
+        .singapore-marker {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border: 3px solid #fff; border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+        }
+        .singapore-marker:hover { transform: scale(1.2); }
+        .singapore-marker.learned {
+            background: linear-gradient(135deg, #a8e6cf 0%, #88d8b0 100%);
         }
     </style>
 </head>
 <body>
-    <!-- 시작 화면 -->
+    <div class="celebration" id="celebration"></div>
+    <div class="notification" id="notification"></div>
+
     <div class="start-screen" id="startScreen">
-        <div class="airplane-icon">✈️</div>
-        <h1 class="start-title">🌏 아시아 탐험 여행</h1>
-        <p class="start-subtitle">아시아 국가들의 위치를 찾아 떠나는 여행!</p>
-
+        <div class="mascot">🧳✈️🌏</div>
+        <h1 class="start-title">아시아 탐험 여행</h1>
+        <p class="start-subtitle">신나는 아시아 여행을 떠나볼까요? 🎒</p>
         <div class="input-group">
-            <label for="studentId">📋 학번</label>
+            <label>📋 학번을 입력해주세요</label>
             <input type="text" id="studentId" placeholder="예: 10101">
-
-            <label for="studentName">✏️ 이름</label>
+            <label>✏️ 이름을 입력해주세요</label>
             <input type="text" id="studentName" placeholder="예: 홍길동">
-
-            <button class="start-btn" onclick="startJourney()">🚀 여행 시작하기</button>
+            <button class="start-btn" onclick="startJourney()">🚀 여행 출발!</button>
         </div>
     </div>
 
-    <!-- 알림 메시지 -->
-    <div class="notification" id="notification"></div>
+    <div class="modal" id="teacherModal">
+        <div class="modal-content">
+            <h2>📊 학생 퀴즈 결과</h2>
+            <div id="resultList"></div>
+            <button class="modal-close" onclick="document.getElementById('teacherModal').classList.remove('show')">닫기</button>
+        </div>
+    </div>
+    <button class="teacher-btn" onclick="openTeacherModal()">👨‍🏫 교사용</button>
 
-    <!-- 메인 컨테이너 -->
     <div class="container">
-        <!-- 헤더 -->
         <header class="header">
-            <div class="header-left">
+            <div>
                 <h1>🌏 아시아 탐험 여행</h1>
-                <p>아시아의 국가와 주요 도시 위치를 학습해보세요!</p>
+                <p>아시아의 국가와 수도를 찾아 떠나는 여행! ✈️</p>
             </div>
-            <div class="user-info" id="userInfo">
-                🎒 탐험가: -
-            </div>
+            <div class="user-info" id="userInfo">🎒 여행자: -</div>
         </header>
 
-        <!-- 탭 메뉴 -->
         <div class="tab-menu">
-            <button class="tab-btn study active" onclick="switchTab('study')">
-                📚 학습 모드
-            </button>
-            <button class="tab-btn quiz" id="quizTab" onclick="switchTab('quiz')">
-                <span class="lock-icon">🔒</span>
-                📝 퀴즈 도전
-            </button>
+            <button class="tab-btn study active" id="studyBtn" onclick="switchTab('study')">📚 학습 모드</button>
+            <button class="tab-btn quiz" id="quizTab" onclick="switchTab('quiz')">🔒 퀴즈 도전</button>
         </div>
 
-        <!-- 메인 콘텐츠 -->
         <div class="main-content">
-            <!-- 지도 영역 -->
             <div class="map-container">
-                <h2 class="map-title" id="mapTitle">🗺️ 아시아 지도 - 국가를 클릭하여 학습하세요!</h2>
+                <h2 class="map-title" id="mapTitle">🗺️ 아시아 지도 - 국가를 클릭해서 여행해보세요!</h2>
+                <div id="map"></div>
 
-                <div class="map-wrapper">
-                    <svg class="asia-map" viewBox="0 0 800 500" id="asiaMap">
-                        <!-- 배경 -->
-                        <rect width="800" height="500" fill="#dbeafe"/>
-
-                        <!-- 국가들 -->
-                        <!-- 러시아 (아시아 부분) -->
-                        <path class="country" id="russia" d="M200,20 L750,20 L780,80 L750,120 L700,100 L600,110 L500,90 L400,100 L350,80 L300,90 L250,70 L200,80 Z" data-name="러시아" data-capital="모스크바" data-flag="🇷🇺"/>
-
-                        <!-- 카자흐스탄 -->
-                        <path class="country" id="kazakhstan" d="M200,100 L350,90 L380,120 L350,160 L280,170 L220,150 L180,130 Z" data-name="카자흐스탄" data-capital="아스타나" data-flag="🇰🇿"/>
-
-                        <!-- 몽골 -->
-                        <path class="country" id="mongolia" d="M450,100 L580,95 L620,130 L580,160 L500,165 L450,140 Z" data-name="몽골" data-capital="울란바토르" data-flag="🇲🇳"/>
-
-                        <!-- 중국 -->
-                        <path class="country" id="china" d="M380,160 L500,165 L580,160 L640,180 L680,220 L660,280 L620,320 L560,340 L500,330 L450,300 L400,280 L380,240 L350,200 L360,170 Z" data-name="중국" data-capital="베이징" data-flag="🇨🇳"/>
-
-                        <!-- 일본 -->
-                        <path class="country" id="japan" d="M700,180 L720,170 L740,190 L730,220 L710,250 L690,240 L700,210 Z M680,260 L700,255 L710,280 L690,290 Z" data-name="일본" data-capital="도쿄" data-flag="🇯🇵"/>
-
-                        <!-- 대한민국 -->
-                        <path class="country" id="southkorea" d="M665,220 L680,215 L690,235 L680,260 L660,255 L660,235 Z" data-name="대한민국" data-capital="서울" data-flag="🇰🇷"/>
-
-                        <!-- 북한 -->
-                        <path class="country" id="northkorea" d="M650,200 L665,195 L680,215 L665,220 L660,235 L645,225 L650,210 Z" data-name="북한" data-capital="평양" data-flag="🇰🇵"/>
-
-                        <!-- 대만 -->
-                        <path class="country" id="taiwan" d="M665,300 L675,295 L680,315 L670,325 L660,315 Z" data-name="대만" data-capital="타이베이" data-flag="🇹🇼"/>
-
-                        <!-- 인도 -->
-                        <path class="country" id="india" d="M280,240 L340,230 L380,250 L400,290 L380,350 L340,400 L300,380 L280,340 L260,300 L250,260 Z" data-name="인도" data-capital="뉴델리" data-flag="🇮🇳"/>
-
-                        <!-- 파키스탄 -->
-                        <path class="country" id="pakistan" d="M220,200 L280,190 L300,220 L280,240 L250,260 L220,250 L200,220 Z" data-name="파키스탄" data-capital="이슬라마바드" data-flag="🇵🇰"/>
-
-                        <!-- 네팔 -->
-                        <path class="country" id="nepal" d="M310,235 L360,230 L365,250 L320,255 Z" data-name="네팔" data-capital="카트만두" data-flag="🇳🇵"/>
-
-                        <!-- 방글라데시 -->
-                        <path class="country" id="bangladesh" d="M355,270 L380,265 L385,290 L365,300 L350,285 Z" data-name="방글라데시" data-capital="다카" data-flag="🇧🇩"/>
-
-                        <!-- 미얀마 -->
-                        <path class="country" id="myanmar" d="M400,290 L420,280 L440,310 L430,360 L410,380 L390,350 Z" data-name="미얀마" data-capital="네피도" data-flag="🇲🇲"/>
-
-                        <!-- 태국 -->
-                        <path class="country" id="thailand" d="M430,340 L460,330 L470,370 L450,420 L430,400 L420,360 Z" data-name="태국" data-capital="방콕" data-flag="🇹🇭"/>
-
-                        <!-- 베트남 -->
-                        <path class="country" id="vietnam" d="M470,320 L490,310 L510,350 L500,400 L480,420 L465,380 Z" data-name="베트남" data-capital="하노이" data-flag="🇻🇳"/>
-
-                        <!-- 라오스 -->
-                        <path class="country" id="laos" d="M455,320 L470,315 L475,350 L460,360 L450,340 Z" data-name="라오스" data-capital="비엔티안" data-flag="🇱🇦"/>
-
-                        <!-- 캄보디아 -->
-                        <path class="country" id="cambodia" d="M460,365 L485,360 L490,390 L470,400 L455,385 Z" data-name="캄보디아" data-capital="프놈펜" data-flag="🇰🇭"/>
-
-                        <!-- 말레이시아 -->
-                        <path class="country" id="malaysia" d="M440,430 L480,425 L500,450 L460,460 Z M520,440 L560,435 L580,460 L540,470 Z" data-name="말레이시아" data-capital="쿠알라룸푸르" data-flag="🇲🇾"/>
-
-                        <!-- 싱가포르 -->
-                        <circle class="country" id="singapore" cx="475" cy="465" r="8" data-name="싱가포르" data-capital="싱가포르" data-flag="🇸🇬"/>
-
-                        <!-- 인도네시아 -->
-                        <path class="country" id="indonesia" d="M480,470 L600,465 L650,480 L600,490 L520,488 L480,480 Z M660,475 L720,470 L740,485 L700,495 L660,488 Z" data-name="인도네시아" data-capital="자카르타" data-flag="🇮🇩"/>
-
-                        <!-- 필리핀 -->
-                        <path class="country" id="philippines" d="M590,340 L620,330 L640,360 L630,400 L600,410 L580,380 Z" data-name="필리핀" data-capital="마닐라" data-flag="🇵🇭"/>
-
-                        <!-- 이란 -->
-                        <path class="country" id="iran" d="M120,180 L180,170 L220,200 L200,250 L150,260 L100,230 Z" data-name="이란" data-capital="테헤란" data-flag="🇮🇷"/>
-
-                        <!-- 이라크 -->
-                        <path class="country" id="iraq" d="M80,180 L120,175 L130,210 L100,230 L60,210 Z" data-name="이라크" data-capital="바그다드" data-flag="🇮🇶"/>
-
-                        <!-- 사우디아라비아 -->
-                        <path class="country" id="saudiarabia" d="M60,220 L120,210 L150,260 L140,320 L80,330 L40,280 Z" data-name="사우디아라비아" data-capital="리야드" data-flag="🇸🇦"/>
-
-                        <!-- UAE -->
-                        <path class="country" id="uae" d="M155,275 L185,270 L190,295 L165,300 Z" data-name="아랍에미리트" data-capital="아부다비" data-flag="🇦🇪"/>
-
-                        <!-- 터키 -->
-                        <path class="country" id="turkey" d="M20,140 L80,130 L100,160 L80,180 L30,175 L10,160 Z" data-name="튀르키예" data-capital="앙카라" data-flag="🇹🇷"/>
-
-                        <!-- 스리랑카 -->
-                        <path class="country" id="srilanka" d="M320,400 L340,395 L345,425 L325,435 L315,415 Z" data-name="스리랑카" data-capital="콜롬보" data-flag="🇱🇰"/>
-
-                        <!-- 우즈베키스탄 -->
-                        <path class="country" id="uzbekistan" d="M180,140 L240,135 L260,165 L230,180 L190,175 L170,155 Z" data-name="우즈베키스탄" data-capital="타슈켄트" data-flag="🇺🇿"/>
-
-                        <!-- 아프가니스탄 -->
-                        <path class="country" id="afghanistan" d="M200,175 L250,170 L280,195 L260,220 L220,210 L195,195 Z" data-name="아프가니스탄" data-capital="카불" data-flag="🇦🇫"/>
-
-                        <!-- 국가 라벨들 -->
-                        <text class="country-label" x="500" y="60">러시아</text>
-                        <text class="country-label" x="270" y="130">카자흐스탄</text>
-                        <text class="country-label" x="510" y="135">몽골</text>
-                        <text class="country-label" x="500" y="240">중국</text>
-                        <text class="country-label" x="700" y="210">일본</text>
-                        <text class="country-label" x="660" y="245">한국</text>
-                        <text class="country-label" x="640" y="215">북한</text>
-                        <text class="country-label" x="665" y="315">대만</text>
-                        <text class="country-label" x="310" y="320">인도</text>
-                        <text class="country-label" x="235" y="230">파키스탄</text>
-                        <text class="country-label" x="330" y="248">네팔</text>
-                        <text class="country-label" x="360" y="285">방글라</text>
-                        <text class="country-label" x="405" y="335">미얀마</text>
-                        <text class="country-label" x="435" y="380">태국</text>
-                        <text class="country-label" x="480" y="365">베트남</text>
-                        <text class="country-label" x="455" y="345">라오스</text>
-                        <text class="country-label" x="465" y="385">캄보디아</text>
-                        <text class="country-label" x="500" y="455">말레이시아</text>
-                        <text class="country-label" x="475" y="478">싱가포르</text>
-                        <text class="country-label" x="570" y="485">인도네시아</text>
-                        <text class="country-label" x="600" y="370">필리핀</text>
-                        <text class="country-label" x="140" y="220">이란</text>
-                        <text class="country-label" x="80" y="200">이라크</text>
-                        <text class="country-label" x="85" y="280">사우디</text>
-                        <text class="country-label" x="165" y="290">UAE</text>
-                        <text class="country-label" x="45" y="160">튀르키예</text>
-                        <text class="country-label" x="320" y="420">스리랑카</text>
-                        <text class="country-label" x="200" y="160">우즈베키스탄</text>
-                        <text class="country-label" x="230" y="200">아프간</text>
-                    </svg>
+                <div class="quiz-overlay" id="quizOverlay">
+                    <h3>이 국가를 찾아 클릭하세요! 🔍</h3>
+                    <div class="country-name" id="quizCountryName">-</div>
                 </div>
 
-                <!-- 퀴즈 질문 (퀴즈 모드에서만 보임) -->
-                <div class="quiz-section" id="quizSection">
-                    <div class="quiz-question">
-                        <h2>다음 국가를 지도에서 찾아 클릭하세요!</h2>
-                        <div class="country-name" id="quizCountryName">-</div>
+                <div class="result-overlay" id="resultOverlay">
+                    <h2>🎊 퀴즈 완료!</h2>
+                    <div class="score" id="finalScore">0/0</div>
+                    <div class="grade" id="gradeLabel">-</div>
+                    <p id="resultMsg">수고하셨습니다!</p>
+                    <p id="attemptsLeft" style="color:#888;margin-top:10px;"></p>
+                    <div style="margin-top:15px;">
+                        <button class="result-btn primary" onclick="copyResult()">📋 결과 복사</button>
+                        <button class="result-btn retry" id="retryBtn" onclick="retryQuiz()" style="display:none;">🔄 다시 도전</button>
+                        <button class="result-btn secondary" onclick="closeResult()">확인</button>
                     </div>
                 </div>
 
-                <!-- 퀴즈 결과 -->
-                <div class="quiz-result" id="quizResult">
-                    <h2>🎉 퀴즈 완료!</h2>
-                    <div class="score" id="finalScore">0/0</div>
-                    <p id="resultMessage">수고하셨습니다!</p>
-                    <button class="retry-btn" onclick="retryQuiz()">🔄 다시 도전하기</button>
-                </div>
-
-                <!-- 힌트 버튼 (퀴즈 모드) -->
-                <button class="hint-btn" id="hintBtn" onclick="showHint()" style="display: none;">
-                    💡 힌트 보기
-                </button>
+                <button class="hint-btn" id="hintBtn" onclick="showHint()">💡 힌트 보기</button>
                 <div class="hint-text" id="hintText"></div>
+
+                <div class="legend" id="legend">
+                    <div class="legend-item"><div class="legend-color" style="background:#ffeaa7;"></div> 여행 대기중</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#a8e6cf;"></div> 여행 완료!</div>
+                    <div class="legend-item"><div class="legend-dot"></div> 수도 위치</div>
+                </div>
             </div>
 
-            <!-- 사이드 패널 -->
             <div class="side-panel">
-                <!-- 국가 정보 카드 -->
-                <div class="info-card" id="studyInfo">
+                <div class="info-card">
                     <h3>📍 국가 정보</h3>
                     <div class="country-info" id="countryInfo">
                         <div class="flag">🗺️</div>
-                        <div class="name">국가를 선택하세요</div>
-                        <div class="capital">지도에서 국가를 클릭하면<br>정보가 표시됩니다.</div>
+                        <div class="name">국가를 선택하세요!</div>
+                        <div class="capital">지도에서 국가를 클릭하면<br>정보가 나타나요~</div>
                     </div>
                 </div>
 
-                <!-- 학습 진행도 -->
                 <div class="info-card">
                     <h3>📊 학습 진행도</h3>
-                    <div class="progress-section">
-                        <h4>학습한 국가</h4>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
-                        </div>
-                        <p class="progress-text" id="progressText">0 / 25 국가 학습 완료</p>
-                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
+                    <p class="progress-text" id="progressText">0 / 18 국가 여행 완료!</p>
                 </div>
 
-                <!-- 퀴즈 통계 (퀴즈 모드에서만 보임) -->
-                <div class="info-card" id="quizStats" style="display: none;">
+                <div class="info-card" id="quizStats" style="display:none;">
                     <h3>📈 퀴즈 현황</h3>
                     <div class="quiz-stats">
-                        <div class="stat-box">
-                            <div class="number" id="currentQ">1</div>
-                            <div class="label">현재 문제</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="number" id="correctCount">0</div>
-                            <div class="label">정답</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="number" id="wrongCount">0</div>
-                            <div class="label">오답</div>
-                        </div>
+                        <div class="stat-box"><div class="number" id="currentQ">1</div><div class="label">문제</div></div>
+                        <div class="stat-box"><div class="number" id="correctCount">0</div><div class="label">정답 ⭕</div></div>
+                        <div class="stat-box"><div class="number" id="wrongCount">0</div><div class="label">오답 ❌</div></div>
                     </div>
                 </div>
 
-                <!-- 국가 목록 -->
                 <div class="info-card">
-                    <h3>🌍 아시아 국가 목록</h3>
+                    <h3>🌍 여행할 국가 (18개)</h3>
                     <div class="country-list" id="countryList"></div>
-                </div>
-
-                <!-- 성취기준 -->
-                <div class="standard-box">
-                    <h4>📌 학습 목표</h4>
-                    <p>[9사(지리)02-01] 다양한 지리 정보와 매체를 활용하여 아시아의 국가와 주요 도시의 위치를 파악하고 자연환경의 특성을 지도로 표현한다.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 국가 데이터
-        const countryData = {
-            russia: { name: '러시아', capital: '모스크바', flag: '🇷🇺', region: '북아시아', desc: '세계에서 가장 넓은 국토를 가진 나라로, 아시아와 유럽에 걸쳐 있습니다.' },
-            kazakhstan: { name: '카자흐스탄', capital: '아스타나', flag: '🇰🇿', region: '중앙아시아', desc: '중앙아시아에서 가장 큰 나라로, 광활한 스텝 지대가 펼쳐져 있습니다.' },
-            mongolia: { name: '몽골', capital: '울란바토르', flag: '🇲🇳', region: '동아시아', desc: '광활한 초원과 고비 사막이 있는 내륙국입니다.' },
-            china: { name: '중국', capital: '베이징', flag: '🇨🇳', region: '동아시아', desc: '세계에서 인구가 가장 많은 나라 중 하나로, 만리장성이 유명합니다.' },
-            japan: { name: '일본', capital: '도쿄', flag: '🇯🇵', region: '동아시아', desc: '4개의 큰 섬으로 이루어진 섬나라로, 첨단 기술과 전통문화가 공존합니다.' },
-            southkorea: { name: '대한민국', capital: '서울', flag: '🇰🇷', region: '동아시아', desc: 'K-POP과 한류 문화의 중심지로, IT 강국입니다.' },
-            northkorea: { name: '북한', capital: '평양', flag: '🇰🇵', region: '동아시아', desc: '한반도 북부에 위치한 국가입니다.' },
-            taiwan: { name: '대만', capital: '타이베이', flag: '🇹🇼', region: '동아시아', desc: '아시아의 4대 용 중 하나로, 반도체 산업이 발달했습니다.' },
-            india: { name: '인도', capital: '뉴델리', flag: '🇮🇳', region: '남아시아', desc: '세계에서 두 번째로 인구가 많으며, 다양한 문화와 종교가 공존합니다.' },
-            pakistan: { name: '파키스탄', capital: '이슬라마바드', flag: '🇵🇰', region: '남아시아', desc: '인더스 문명의 발상지로, 이슬람 국가입니다.' },
-            nepal: { name: '네팔', capital: '카트만두', flag: '🇳🇵', region: '남아시아', desc: '히말라야 산맥과 에베레스트 산이 있는 나라입니다.' },
-            bangladesh: { name: '방글라데시', capital: '다카', flag: '🇧🇩', region: '남아시아', desc: '갠지스강 삼각주에 위치한 인구 밀도가 높은 나라입니다.' },
-            myanmar: { name: '미얀마', capital: '네피도', flag: '🇲🇲', region: '동남아시아', desc: '황금 파고다와 불교 사원이 유명한 나라입니다.' },
-            thailand: { name: '태국', capital: '방콕', flag: '🇹🇭', region: '동남아시아', desc: '동남아시아의 관광 대국으로, 불교 문화가 발달했습니다.' },
-            vietnam: { name: '베트남', capital: '하노이', flag: '🇻🇳', region: '동남아시아', desc: '쌀국수(퍼)와 아름다운 해변이 유명한 나라입니다.' },
-            laos: { name: '라오스', capital: '비엔티안', flag: '🇱🇦', region: '동남아시아', desc: '메콩강이 흐르는 동남아시아의 내륙국입니다.' },
-            cambodia: { name: '캄보디아', capital: '프놈펜', flag: '🇰🇭', region: '동남아시아', desc: '앙코르와트 유적지가 있는 나라입니다.' },
-            malaysia: { name: '말레이시아', capital: '쿠알라룸푸르', flag: '🇲🇾', region: '동남아시아', desc: '페트로나스 트윈타워가 유명한 다민족 국가입니다.' },
-            singapore: { name: '싱가포르', capital: '싱가포르', flag: '🇸🇬', region: '동남아시아', desc: '도시 국가로 금융과 무역의 중심지입니다.' },
-            indonesia: { name: '인도네시아', capital: '자카르타', flag: '🇮🇩', region: '동남아시아', desc: '세계에서 가장 많은 섬을 가진 나라입니다.' },
-            philippines: { name: '필리핀', capital: '마닐라', flag: '🇵🇭', region: '동남아시아', desc: '7,000개 이상의 섬으로 이루어진 군도 국가입니다.' },
-            iran: { name: '이란', capital: '테헤란', flag: '🇮🇷', region: '서아시아', desc: '페르시아 문명의 후예로, 석유 자원이 풍부합니다.' },
-            iraq: { name: '이라크', capital: '바그다드', flag: '🇮🇶', region: '서아시아', desc: '메소포타미아 문명의 발상지입니다.' },
-            saudiarabia: { name: '사우디아라비아', capital: '리야드', flag: '🇸🇦', region: '서아시아', desc: '이슬람의 성지 메카가 있는 나라입니다.' },
-            uae: { name: '아랍에미리트', capital: '아부다비', flag: '🇦🇪', region: '서아시아', desc: '두바이의 초고층 빌딩이 유명한 부유한 산유국입니다.' },
-            turkey: { name: '튀르키예', capital: '앙카라', flag: '🇹🇷', region: '서아시아', desc: '아시아와 유럽의 경계에 위치한 나라입니다.' },
-            srilanka: { name: '스리랑카', capital: '콜롬보', flag: '🇱🇰', region: '남아시아', desc: '인도양의 보석이라 불리는 섬나라입니다.' },
-            uzbekistan: { name: '우즈베키스탄', capital: '타슈켄트', flag: '🇺🇿', region: '중앙아시아', desc: '실크로드의 중심지였던 역사적인 나라입니다.' },
-            afghanistan: { name: '아프가니스탄', capital: '카불', flag: '🇦🇫', region: '남아시아', desc: '힌두쿠시 산맥이 지나는 내륙국입니다.' }
+        // 색상 상수 정의
+        const COLORS = {
+            STUDY_PENDING: '#ffeaa7',   // 연노랑 - 학습 대기
+            STUDY_DONE: '#a8e6cf',       // 초록 - 학습 완료
+            QUIZ_DEFAULT: '#b8d4e8',     // 연파랑 - 퀴즈 기본
+            QUIZ_CORRECT: '#a8e6cf',     // 초록 - 정답
+            QUIZ_WRONG: '#f5b7b1',       // 연빨강 - 오답
+            OTHER_COUNTRY: '#e8e8e8'     // 회색 - 기타 국가
         };
 
-        // 게임 상태
+        // 국가 데이터
+        const countries = {
+            TR: { name: '튀르키예', capital: '앙카라', flag: '🇹🇷', region: '서아시아', capitalCoords: [39.93, 32.86] },
+            IR: { name: '이란', capital: '테헤란', flag: '🇮🇷', region: '서아시아', capitalCoords: [35.69, 51.39] },
+            SA: { name: '사우디아라비아', capital: '리야드', flag: '🇸🇦', region: '서아시아', capitalCoords: [24.71, 46.68] },
+            AE: { name: 'UAE', capital: '아부다비', flag: '🇦🇪', region: '서아시아', capitalCoords: [24.45, 54.38] },
+            KZ: { name: '카자흐스탄', capital: '아스타나', flag: '🇰🇿', region: '중앙아시아', capitalCoords: [51.17, 71.45] },
+            MN: { name: '몽골', capital: '울란바토르', flag: '🇲🇳', region: '동아시아', capitalCoords: [47.89, 106.91] },
+            CN: { name: '중국', capital: '베이징', flag: '🇨🇳', region: '동아시아', capitalCoords: [39.90, 116.41] },
+            IN: { name: '인도', capital: '뉴델리', flag: '🇮🇳', region: '남아시아', capitalCoords: [28.61, 77.21] },
+            NP: { name: '네팔', capital: '카트만두', flag: '🇳🇵', region: '남아시아', capitalCoords: [27.72, 85.32] },
+            LK: { name: '스리랑카', capital: '콜롬보', flag: '🇱🇰', region: '남아시아', capitalCoords: [6.93, 79.86] },
+            MM: { name: '미얀마', capital: '네피도', flag: '🇲🇲', region: '동남아시아', capitalCoords: [19.76, 96.08] },
+            TH: { name: '태국', capital: '방콕', flag: '🇹🇭', region: '동남아시아', capitalCoords: [13.76, 100.50] },
+            VN: { name: '베트남', capital: '하노이', flag: '🇻🇳', region: '동남아시아', capitalCoords: [21.03, 105.85] },
+            MY: { name: '말레이시아', capital: '쿠알라룸푸르', flag: '🇲🇾', region: '동남아시아', capitalCoords: [3.14, 101.69] },
+            SG: { name: '싱가포르', capital: '싱가포르', flag: '🇸🇬', region: '동남아시아', capitalCoords: [1.35, 103.82] },
+            ID: { name: '인도네시아', capital: '자카르타', flag: '🇮🇩', region: '동남아시아', capitalCoords: [-6.21, 106.85] },
+            PH: { name: '필리핀', capital: '마닐라', flag: '🇵🇭', region: '동남아시아', capitalCoords: [14.60, 120.98] },
+            KR: { name: '대한민국', capital: '서울', flag: '🇰🇷', region: '동아시아', capitalCoords: [37.57, 126.98] },
+            JP: { name: '일본', capital: '도쿄', flag: '🇯🇵', region: '동아시아', capitalCoords: [35.68, 139.65] }
+        };
+
+        const isoMapping = {
+            'TUR': 'TR', 'IRN': 'IR', 'SAU': 'SA', 'ARE': 'AE', 'KAZ': 'KZ',
+            'MNG': 'MN', 'CHN': 'CN', 'IND': 'IN', 'NPL': 'NP', 'LKA': 'LK',
+            'MMR': 'MM', 'THA': 'TH', 'VNM': 'VN', 'MYS': 'MY', 'SGP': 'SG',
+            'IDN': 'ID', 'PHL': 'PH', 'KOR': 'KR', 'JPN': 'JP'
+        };
+
+        let map;
         let currentUser = { id: '', name: '' };
         let learnedCountries = new Set();
         let currentMode = 'study';
-        let quizQuestions = [];
-        let currentQuizIndex = 0;
-        let correctAnswers = 0;
-        let wrongAnswers = 0;
+        let quizQuestions = [], currentQuizIndex = 0, correctAnswers = 0, wrongAnswers = 0;
         let quizUnlocked = false;
+        let quizAttempts = 0;
+        const MAX_ATTEMPTS = 2;
+        let bestScore = 0;
+        let countryLayers = {};
+        let capitalMarkers = [];
+        let labelMarkers = [];
+        let singaporeMarker = null;
 
-        // 초기화
-        function init() {
-            createCountryList();
-            addMapListeners();
-        }
-
-        // 여행 시작
         function startJourney() {
             const id = document.getElementById('studentId').value.trim();
             const name = document.getElementById('studentName').value.trim();
-
-            if (!id || !name) {
-                showNotification('학번과 이름을 모두 입력해주세요!', 'error');
-                return;
-            }
+            if (!id || !name) { notify('학번과 이름을 입력해주세요! 😊', 'error'); return; }
 
             currentUser = { id, name };
-            document.getElementById('userInfo').textContent = `🎒 탐험가: ${name} (${id})`;
+            document.getElementById('userInfo').textContent = `🎒 ${name}`;
             document.getElementById('startScreen').classList.add('hidden');
-            showNotification(`${name}님, 아시아 탐험 여행에 오신 것을 환영합니다! 🌏`, 'success');
-        }
 
-        // 국가 목록 생성
-        function createCountryList() {
-            const listContainer = document.getElementById('countryList');
-            listContainer.innerHTML = '';
-
-            Object.keys(countryData).forEach(id => {
-                const country = countryData[id];
-                const chip = document.createElement('div');
-                chip.className = 'country-chip';
-                chip.textContent = country.name;
-                chip.onclick = () => selectCountry(id);
-                chip.id = `chip-${id}`;
-                listContainer.appendChild(chip);
-            });
-        }
-
-        // 지도 이벤트 리스너
-        function addMapListeners() {
-            document.querySelectorAll('.country').forEach(country => {
-                country.addEventListener('click', (e) => {
-                    const id = e.target.id;
-                    if (currentMode === 'study') {
-                        selectCountry(id);
-                    } else if (currentMode === 'quiz') {
-                        checkQuizAnswer(id);
-                    }
-                });
-            });
-        }
-
-        // 국가 선택 (학습 모드)
-        function selectCountry(id) {
-            if (!countryData[id]) return;
-
-            // 기존 선택 해제
-            document.querySelectorAll('.country.selected').forEach(el => {
-                el.classList.remove('selected');
-            });
-
-            // 새 국가 선택
-            const countryEl = document.getElementById(id);
-            if (countryEl) {
-                countryEl.classList.add('selected');
-                countryEl.classList.add('learned');
+            const saved = JSON.parse(localStorage.getItem('quizData_' + id) || '{}');
+            if (saved.attempts !== undefined) {
+                quizAttempts = saved.attempts;
+                bestScore = saved.bestScore || 0;
             }
 
-            // 국가 정보 표시
-            const country = countryData[id];
+            updateQuizButton();
+            initMap();
+            createCountryList();
+            notify(`${name}님, 아시아 여행을 시작합니다! 🌏✈️`, 'success');
+        }
+
+        function updateQuizButton() {
+            const btn = document.getElementById('quizTab');
+            const remaining = MAX_ATTEMPTS - quizAttempts;
+
+            if (quizUnlocked || quizAttempts > 0) {
+                btn.classList.add('unlocked');
+                if (remaining > 0) {
+                    btn.innerHTML = `📝 퀴즈 도전 <span style="background:#ffeaa7;color:#d68910;padding:3px 10px;border-radius:10px;font-size:0.8rem;margin-left:8px;">${remaining}회 남음</span>`;
+                } else {
+                    btn.classList.remove('unlocked');
+                    btn.classList.add('used');
+                    btn.innerHTML = `✅ 퀴즈 완료 (최고: ${bestScore}점)`;
+                }
+            }
+        }
+
+        function initMap() {
+            map = L.map('map', { center: [28, 80], zoom: 3, minZoom: 2, maxZoom: 7 });
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', { opacity: 0.3 }).addTo(map);
+            loadGeoJSON();
+        }
+
+        function loadGeoJSON() {
+            fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson')
+                .then(res => res.json())
+                .then(data => processGeoJSON(data))
+                .catch(err => {
+                    fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+                        .then(res => res.json())
+                        .then(data => processGeoJSON(data))
+                        .catch(err2 => notify('지도 로드 실패. 새로고침 해주세요.', 'error'));
+                });
+        }
+
+        function processGeoJSON(data) {
+            const asiaISO = ['TUR','IRN','SAU','ARE','KAZ','MNG','CHN','IND','NPL','LKA','MMR','THA','VNM','MYS','SGP','IDN','PHL','KOR','JPN',
+                'RUS','PAK','AFG','IRQ','SYR','JOR','YEM','OMN','KWT','QAT','BHR','UZB','TKM','TJK','KGZ','BGD','BTN','LAO','KHM','TWN','PRK','BRN'];
+
+            const filtered = data.features.filter(f => {
+                const iso = f.properties.ISO_A3 || f.properties.ADM0_A3 || f.properties.iso_a3;
+                return asiaISO.includes(iso);
+            });
+
+            L.geoJSON({ type: 'FeatureCollection', features: filtered }, {
+                style: feature => getStyle(feature),
+                onEachFeature: (feature, layer) => {
+                    const iso3 = feature.properties.ISO_A3 || feature.properties.ADM0_A3 || feature.properties.iso_a3;
+                    const code = isoMapping[iso3];
+
+                    if (code) {
+                        countryLayers[code] = layer;
+                        layer.on('click', function(e) {
+                            L.DomEvent.stopPropagation(e);
+                            handleClick(code);
+                        });
+                        layer.on('mouseover', function() { this.setStyle({ weight: 3, fillOpacity: 0.9 }); });
+                        layer.on('mouseout', function() { this.setStyle(getStyle(feature)); });
+                    }
+                }
+            }).addTo(map);
+
+            addCapitalsAndLabels();
+            addSingaporeMarker();
+            map.setView([28, 85], 3);
+            notify('지도 준비 완료! 국가를 클릭해보세요~ 🗺️', 'info');
+        }
+
+        function addSingaporeMarker() {
+            const sgData = countries['SG'];
+            const sgIcon = L.divIcon({
+                className: '',
+                html: `<div class="singapore-marker">🇸🇬</div>`,
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            });
+            singaporeMarker = L.marker(sgData.capitalCoords, { icon: sgIcon, zIndexOffset: 1000 }).addTo(map);
+            singaporeMarker.on('click', function(e) {
+                L.DomEvent.stopPropagation(e);
+                handleClick('SG');
+            });
+        }
+
+        // 스타일 - 학습 모드: 연노랑(대기) / 초록(완료)
+        function getStyle(feature) {
+            const iso3 = feature.properties.ISO_A3 || feature.properties.ADM0_A3 || feature.properties.iso_a3;
+            const code = isoMapping[iso3];
+            const isStudy = code && countries[code];
+            const isLearned = code && learnedCountries.has(code);
+
+            if (isStudy) {
+                if (currentMode === 'study') {
+                    return {
+                        fillColor: isLearned ? COLORS.STUDY_DONE : COLORS.STUDY_PENDING,
+                        weight: 2,
+                        opacity: 1,
+                        color: '#888',
+                        fillOpacity: 0.8
+                    };
+                } else {
+                    return {
+                        fillColor: COLORS.QUIZ_DEFAULT,
+                        weight: 1.5,
+                        opacity: 1,
+                        color: '#666',
+                        fillOpacity: 0.7
+                    };
+                }
+            } else {
+                return {
+                    fillColor: COLORS.OTHER_COUNTRY,
+                    weight: 1,
+                    opacity: 0.5,
+                    color: '#aaa',
+                    fillOpacity: 0.3
+                };
+            }
+        }
+
+        function addCapitalsAndLabels() {
+            Object.entries(countries).forEach(([code, data]) => {
+                if (code === 'SG') return;
+
+                const dotIcon = L.divIcon({
+                    className: '',
+                    html: '<div style="width:8px;height:8px;background:#e74c3c;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>',
+                    iconSize: [12, 12],
+                    iconAnchor: [6, 6]
+                });
+                const marker = L.marker(data.capitalCoords, { icon: dotIcon, interactive: false }).addTo(map);
+
+                const capLabel = L.divIcon({
+                    className: '',
+                    html: `<div style="font-family:'Jua',sans-serif;font-size:10px;font-weight:bold;color:#c0392b;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;white-space:nowrap;">${data.capital}</div>`,
+                    iconSize: [100, 20],
+                    iconAnchor: [-5, 10]
+                });
+                const capMarker = L.marker(data.capitalCoords, { icon: capLabel, interactive: false }).addTo(map);
+                capitalMarkers.push({ dot: marker, label: capMarker, code });
+
+                if (countryLayers[code]) {
+                    const bounds = countryLayers[code].getBounds();
+                    const center = bounds.getCenter();
+                    const countryLabel = L.divIcon({
+                        className: '',
+                        html: `<div style="font-family:'Jua',sans-serif;font-size:11px;font-weight:bold;color:#5d4e6d;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff;white-space:nowrap;text-align:center;">${data.name}</div>`,
+                        iconSize: [100, 20],
+                        iconAnchor: [50, 10]
+                    });
+                    const lbl = L.marker(center, { icon: countryLabel, interactive: false }).addTo(map);
+                    labelMarkers.push({ marker: lbl, code });
+                }
+            });
+        }
+
+        function handleClick(code) {
+            if (!countries[code]) return;
+            if (currentMode === 'study') learnCountry(code);
+            else if (currentMode === 'quiz') checkQuizAnswer(code);
+        }
+
+        function learnCountry(code) {
+            const c = countries[code];
+
             document.getElementById('countryInfo').innerHTML = `
-                <div class="flag">${country.flag}</div>
-                <div class="name">${country.name}</div>
-                <div class="capital">수도: ${country.capital} | 지역: ${country.region}</div>
-                <div class="description">${country.desc}</div>
+                <div class="flag">${c.flag}</div>
+                <div class="name">${c.name}</div>
+                <div class="capital">🏛️ 수도: ${c.capital}</div>
+                <div class="desc">📍 지역: ${c.region}<br><br>여행 완료! 🎉</div>
             `;
 
-            // 학습 완료 표시
-            if (!learnedCountries.has(id)) {
-                learnedCountries.add(id);
+            if (!learnedCountries.has(code)) {
+                learnedCountries.add(code);
+                updateCountryStyle(code);
+                updateSingaporeMarkerStyle();
+                document.getElementById('chip-' + code)?.classList.add('learned');
                 updateProgress();
+            }
 
-                const chip = document.getElementById(`chip-${id}`);
-                if (chip) chip.classList.add('learned');
+            if (countryLayers[code]) {
+                map.fitBounds(countryLayers[code].getBounds(), { maxZoom: 5, padding: [30, 30] });
+            } else if (code === 'SG') {
+                map.setView(countries['SG'].capitalCoords, 6);
+            }
+
+            notify(`${c.flag} ${c.name}에 도착했어요! (수도: ${c.capital})`, 'success');
+        }
+
+        function updateCountryStyle(code) {
+            if (countryLayers[code]) {
+                const isLearned = learnedCountries.has(code);
+                countryLayers[code].setStyle({
+                    fillColor: isLearned ? COLORS.STUDY_DONE : COLORS.STUDY_PENDING,
+                    weight: 2,
+                    color: '#888',
+                    fillOpacity: 0.8
+                });
             }
         }
 
-        // 진행도 업데이트
+        function updateSingaporeMarkerStyle() {
+            if (singaporeMarker && currentMode === 'study') {
+                const isLearned = learnedCountries.has('SG');
+                const sgIcon = L.divIcon({
+                    className: '',
+                    html: `<div class="singapore-marker ${isLearned ? 'learned' : ''}">🇸🇬</div>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+                singaporeMarker.setIcon(sgIcon);
+            }
+        }
+
         function updateProgress() {
-            const total = Object.keys(countryData).length;
-            const learned = learnedCountries.size;
-            const percent = (learned / total) * 100;
+            const total = Object.keys(countries).length;
+            const done = learnedCountries.size;
+            document.getElementById('progressFill').style.width = (done / total * 100) + '%';
+            document.getElementById('progressText').textContent = `${done} / ${total} 국가 여행 완료! ✈️`;
 
-            document.getElementById('progressFill').style.width = `${percent}%`;
-            document.getElementById('progressText').textContent = `${learned} / ${total} 국가 학습 완료`;
-
-            // 퀴즈 해금 체크
-            if (learned >= total * 0.5 && !quizUnlocked) {
-                unlockQuiz();
+            if (done >= total * 0.5 && !quizUnlocked && quizAttempts < MAX_ATTEMPTS) {
+                quizUnlocked = true;
+                updateQuizButton();
+                notify('🎉 퀴즈가 열렸어요! 도전해보세요~', 'success');
             }
         }
 
-        // 퀴즈 해금
-        function unlockQuiz() {
-            quizUnlocked = true;
-            const quizTab = document.getElementById('quizTab');
-            quizTab.classList.add('unlocked');
-            quizTab.innerHTML = '📝 퀴즈 도전';
-            showNotification('🎉 축하합니다! 퀴즈가 해금되었습니다!', 'success');
-        }
-
-        // 탭 전환
         function switchTab(tab) {
-            if (tab === 'quiz' && !quizUnlocked) {
-                showNotification('먼저 국가의 50% 이상을 학습해주세요! 📚', 'info');
-                return;
-            }
-
-            currentMode = tab;
-
-            // 탭 버튼 스타일
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            if (tab === 'study') {
-                document.querySelector('.tab-btn.study').classList.add('active');
+            if (tab === 'quiz') {
+                if (!quizUnlocked && quizAttempts === 0) {
+                    notify('50% 이상 여행하면 퀴즈가 열려요! 🗺️', 'info');
+                    return;
+                }
+                if (quizAttempts >= MAX_ATTEMPTS) {
+                    notify(`퀴즈 기회를 모두 사용했어요! (최고점수: ${bestScore}점)`, 'info');
+                    return;
+                }
+                startQuiz();
             } else {
-                document.querySelector('.tab-btn.quiz').classList.add('active');
-            }
-
-            // 콘텐츠 전환
-            if (tab === 'study') {
-                document.getElementById('quizSection').classList.remove('active');
-                document.getElementById('studyInfo').style.display = 'block';
+                currentMode = 'study';
+                document.getElementById('studyBtn').classList.add('active');
+                document.getElementById('quizTab').classList.remove('active');
+                document.getElementById('quizOverlay').classList.remove('active');
                 document.getElementById('quizStats').style.display = 'none';
                 document.getElementById('hintBtn').style.display = 'none';
-                document.getElementById('quizResult').classList.remove('show');
-                document.getElementById('mapTitle').textContent = '🗺️ 아시아 지도 - 국가를 클릭하여 학습하세요!';
-
-                // 국가 상태 초기화
-                document.querySelectorAll('.country').forEach(el => {
-                    el.classList.remove('selected', 'correct', 'wrong');
-                    if (learnedCountries.has(el.id)) {
-                        el.classList.add('learned');
-                    }
-                });
-            } else {
-                startQuiz();
+                document.getElementById('legend').style.display = 'block';
+                document.getElementById('mapTitle').textContent = '🗺️ 아시아 지도 - 국가를 클릭해서 여행해보세요!';
+                showLabels(true);
+                resetStudyStyles();
             }
         }
 
-        // 퀴즈 시작
-        function startQuiz() {
-            document.getElementById('quizSection').classList.add('active');
-            document.getElementById('studyInfo').style.display = 'none';
-            document.getElementById('quizStats').style.display = 'block';
-            document.getElementById('hintBtn').style.display = 'flex';
-            document.getElementById('quizResult').classList.remove('show');
-            document.getElementById('mapTitle').textContent = '🗺️ 아시아 지도 - 정답 국가를 클릭하세요!';
+        function showLabels(show) {
+            capitalMarkers.forEach(m => {
+                if (show) { m.dot.addTo(map); m.label.addTo(map); }
+                else { map.removeLayer(m.dot); map.removeLayer(m.label); }
+            });
+            labelMarkers.forEach(m => {
+                if (show) m.marker.addTo(map);
+                else map.removeLayer(m.marker);
+            });
+        }
 
-            // 퀴즈 초기화
-            quizQuestions = Object.keys(countryData).sort(() => Math.random() - 0.5);
+        function resetStudyStyles() {
+            Object.keys(countries).forEach(code => updateCountryStyle(code));
+
+            // 싱가포르 마커 복원
+            if (singaporeMarker) {
+                const isLearned = learnedCountries.has('SG');
+                const sgIcon = L.divIcon({
+                    className: '',
+                    html: `<div class="singapore-marker ${isLearned ? 'learned' : ''}">🇸🇬</div>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+                singaporeMarker.setIcon(sgIcon);
+            }
+        }
+
+        function startQuiz() {
+            currentMode = 'quiz';
+            document.getElementById('studyBtn').classList.remove('active');
+            document.getElementById('quizTab').classList.add('active');
+            document.getElementById('quizOverlay').classList.add('active');
+            document.getElementById('quizStats').style.display = 'block';
+            document.getElementById('hintBtn').style.display = 'block';
+            document.getElementById('legend').style.display = 'none';
+            document.getElementById('mapTitle').textContent = '🎯 퀴즈 모드 - 정답 국가를 클릭하세요!';
+
+            showLabels(false);
+
+            // 싱가포르 마커 퀴즈용으로 변경
+            if (singaporeMarker) {
+                const sgQuizIcon = L.divIcon({
+                    className: '',
+                    html: `<div style="width:24px;height:24px;background:${COLORS.QUIZ_DEFAULT};border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;"></div>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+                singaporeMarker.setIcon(sgQuizIcon);
+            }
+
+            quizQuestions = Object.keys(countries).sort(() => Math.random() - 0.5);
             currentQuizIndex = 0;
             correctAnswers = 0;
             wrongAnswers = 0;
 
-            // 국가 상태 초기화
-            document.querySelectorAll('.country').forEach(el => {
-                el.classList.remove('selected', 'correct', 'wrong', 'learned');
+            // 모든 학습 대상 국가를 퀴즈 색상으로 통일
+            Object.keys(countries).forEach(code => {
+                if (countryLayers[code]) {
+                    countryLayers[code].setStyle({
+                        fillColor: COLORS.QUIZ_DEFAULT,
+                        weight: 1.5,
+                        color: '#666',
+                        fillOpacity: 0.7
+                    });
+                }
             });
 
+            map.setView([28, 85], 3);
             updateQuizUI();
-            showNextQuestion();
+            showQuestion();
         }
 
-        // 다음 문제 표시
-        function showNextQuestion() {
+        function showQuestion() {
             if (currentQuizIndex >= quizQuestions.length) {
                 endQuiz();
                 return;
             }
-
-            const countryId = quizQuestions[currentQuizIndex];
-            const country = countryData[countryId];
-
-            document.getElementById('quizCountryName').textContent = `${country.flag} ${country.name}`;
+            const code = quizQuestions[currentQuizIndex];
+            const c = countries[code];
+            document.getElementById('quizCountryName').textContent = `${c.flag} ${c.name}`;
             document.getElementById('hintText').classList.remove('show');
         }
 
-        // 퀴즈 정답 체크
-        function checkQuizAnswer(id) {
-            const correctId = quizQuestions[currentQuizIndex];
-            const countryEl = document.getElementById(id);
+        function checkQuizAnswer(code) {
+            const correct = quizQuestions[currentQuizIndex];
 
-            if (id === correctId) {
-                countryEl.classList.add('correct');
+            if (code === correct) {
                 correctAnswers++;
-                showNotification('정답입니다! 🎉', 'success');
+                countryLayers[code]?.setStyle({ fillColor: COLORS.QUIZ_CORRECT, weight: 3 });
+                if (code === 'SG' && singaporeMarker) {
+                    const sgCorrectIcon = L.divIcon({
+                        className: '',
+                        html: `<div style="width:24px;height:24px;background:${COLORS.QUIZ_CORRECT};border:3px solid #fff;border-radius:50%;"></div>`,
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 14]
+                    });
+                    singaporeMarker.setIcon(sgCorrectIcon);
+                }
+                celebrate();
+                notify('🎉 정답이에요!', 'success');
             } else {
-                countryEl.classList.add('wrong');
-                document.getElementById(correctId).classList.add('correct');
                 wrongAnswers++;
-                showNotification(`오답! 정답은 ${countryData[correctId].name}입니다.`, 'error');
+                countryLayers[code]?.setStyle({ fillColor: COLORS.QUIZ_WRONG, weight: 2 });
+                countryLayers[correct]?.setStyle({ fillColor: COLORS.QUIZ_CORRECT, weight: 3 });
+                if (code === 'SG' && singaporeMarker) {
+                    const sgWrongIcon = L.divIcon({
+                        className: '',
+                        html: `<div style="width:24px;height:24px;background:${COLORS.QUIZ_WRONG};border:3px solid #fff;border-radius:50%;"></div>`,
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 14]
+                    });
+                    singaporeMarker.setIcon(sgWrongIcon);
+                }
+                if (correct === 'SG' && singaporeMarker) {
+                    const sgCorrectIcon = L.divIcon({
+                        className: '',
+                        html: `<div style="width:24px;height:24px;background:${COLORS.QUIZ_CORRECT};border:3px solid #fff;border-radius:50%;"></div>`,
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 14]
+                    });
+                    singaporeMarker.setIcon(sgCorrectIcon);
+                }
+                notify(`❌ 정답은 ${countries[correct].name}이에요!`, 'error');
             }
 
             updateQuizUI();
 
-            // 다음 문제로
             setTimeout(() => {
-                document.querySelectorAll('.country').forEach(el => {
-                    el.classList.remove('correct', 'wrong');
+                [code, correct].forEach(c => {
+                    countryLayers[c]?.setStyle({ fillColor: COLORS.QUIZ_DEFAULT, weight: 1.5, color: '#666', fillOpacity: 0.7 });
                 });
+                if (singaporeMarker) {
+                    const sgQuizIcon = L.divIcon({
+                        className: '',
+                        html: `<div style="width:24px;height:24px;background:${COLORS.QUIZ_DEFAULT};border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;"></div>`,
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 14]
+                    });
+                    singaporeMarker.setIcon(sgQuizIcon);
+                }
                 currentQuizIndex++;
-                showNextQuestion();
+                showQuestion();
             }, 1500);
         }
 
-        // 퀴즈 UI 업데이트
         function updateQuizUI() {
             document.getElementById('currentQ').textContent = Math.min(currentQuizIndex + 1, quizQuestions.length);
             document.getElementById('correctCount').textContent = correctAnswers;
             document.getElementById('wrongCount').textContent = wrongAnswers;
         }
 
-        // 퀴즈 종료
         function endQuiz() {
-            document.getElementById('quizSection').classList.remove('active');
-            document.getElementById('quizResult').classList.add('show');
-            document.getElementById('hintBtn').style.display = 'none';
+            quizAttempts++;
 
             const total = quizQuestions.length;
-            const score = Math.round((correctAnswers / total) * 100);
+            const score = Math.round(correctAnswers / total * 100);
 
+            if (score > bestScore) bestScore = score;
+
+            localStorage.setItem('quizData_' + currentUser.id, JSON.stringify({
+                attempts: quizAttempts,
+                bestScore: bestScore
+            }));
+
+            saveResult();
+
+            document.getElementById('quizOverlay').classList.remove('active');
+            document.getElementById('hintBtn').style.display = 'none';
             document.getElementById('finalScore').textContent = `${correctAnswers}/${total} (${score}점)`;
 
-            let message = '';
-            if (score >= 90) message = '🏆 훌륭합니다! 아시아 지리 전문가!';
-            else if (score >= 70) message = '👏 잘했어요! 조금만 더 연습하면 완벽해요!';
-            else if (score >= 50) message = '💪 괜찮아요! 학습 모드에서 더 공부해보세요!';
-            else message = '📚 학습 모드에서 국가 위치를 다시 익혀보세요!';
+            let grade, cls;
+            if (score >= 90) { grade = '🏆 최우수'; cls = 'excellent'; }
+            else if (score >= 70) { grade = '👏 우수'; cls = 'good'; }
+            else if (score >= 50) { grade = '💪 보통'; cls = 'average'; }
+            else { grade = '📚 노력 필요'; cls = 'needwork'; }
 
-            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('gradeLabel').textContent = grade;
+            document.getElementById('gradeLabel').className = 'grade ' + cls;
+
+            const remaining = MAX_ATTEMPTS - quizAttempts;
+            if (remaining > 0) {
+                document.getElementById('attemptsLeft').textContent = `🔄 ${remaining}회 더 도전할 수 있어요!`;
+                document.getElementById('retryBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('attemptsLeft').textContent = `✨ 최고 점수: ${bestScore}점`;
+                document.getElementById('retryBtn').style.display = 'none';
+            }
+
+            document.getElementById('resultOverlay').classList.add('show');
+            updateQuizButton();
         }
 
-        // 퀴즈 재시도
+        function saveResult() {
+            let results = JSON.parse(localStorage.getItem('asiaResults') || '[]');
+            const existing = results.find(r => r.id === currentUser.id);
+
+            if (existing) {
+                if (bestScore > existing.score) {
+                    existing.score = bestScore;
+                    existing.time = new Date().toLocaleString('ko-KR');
+                }
+            } else {
+                results.push({
+                    id: currentUser.id,
+                    name: currentUser.name,
+                    score: bestScore,
+                    time: new Date().toLocaleString('ko-KR')
+                });
+            }
+
+            localStorage.setItem('asiaResults', JSON.stringify(results));
+        }
+
         function retryQuiz() {
+            document.getElementById('resultOverlay').classList.remove('show');
             startQuiz();
         }
 
-        // 힌트 표시
         function showHint() {
-            if (currentQuizIndex >= quizQuestions.length) return;
-
-            const countryId = quizQuestions[currentQuizIndex];
-            const country = countryData[countryId];
-
-            document.getElementById('hintText').textContent = `💡 힌트: ${country.region}에 위치해 있어요!`;
+            const code = quizQuestions[currentQuizIndex];
+            const c = countries[code];
+            document.getElementById('hintText').textContent = `💡 힌트: ${c.region}에 있어요! (수도: ${c.capital})`;
             document.getElementById('hintText').classList.add('show');
-
-            setTimeout(() => {
-                document.getElementById('hintText').classList.remove('show');
-            }, 3000);
+            setTimeout(() => document.getElementById('hintText').classList.remove('show'), 3000);
         }
 
-        // 알림 표시
-        function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type} show`;
-
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
+        function celebrate() {
+            const el = document.getElementById('celebration');
+            el.classList.add('active');
+            el.innerHTML = '';
+            const colors = ['#ff9a9e','#fad0c4','#a8e6cf','#88d8b0','#ffecd2','#fcb69f','#74b9ff','#ffeaa7'];
+            for (let i = 0; i < 50; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + '%';
+                c.style.width = (Math.random() * 10 + 5) + 'px';
+                c.style.height = c.style.width;
+                c.style.background = colors[Math.floor(Math.random() * colors.length)];
+                c.style.animationDelay = Math.random() * 0.5 + 's';
+                c.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                el.appendChild(c);
+            }
+            setTimeout(() => el.classList.remove('active'), 1500);
         }
 
-        // 초기화 실행
-        init();
+        function notify(msg, type) {
+            const el = document.getElementById('notification');
+            el.textContent = msg;
+            el.className = 'notification ' + type + ' show';
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        function createCountryList() {
+            const container = document.getElementById('countryList');
+            container.innerHTML = '';
+            Object.entries(countries).forEach(([code, data]) => {
+                const chip = document.createElement('div');
+                chip.className = 'country-chip';
+                chip.id = 'chip-' + code;
+                chip.textContent = data.name;
+                chip.onclick = () => {
+                    if (code === 'SG') {
+                        map.setView(data.capitalCoords, 6);
+                    } else if (countryLayers[code]) {
+                        map.fitBounds(countryLayers[code].getBounds(), { maxZoom: 5 });
+                    }
+                    if (currentMode === 'study') learnCountry(code);
+                };
+                container.appendChild(chip);
+            });
+        }
+
+        function copyResult() {
+            const text = `[아시아 탐험 퀴즈 결과] 🌏
+학번: ${currentUser.id}
+이름: ${currentUser.name}
+점수: ${correctAnswers}/${quizQuestions.length} (${Math.round(correctAnswers/quizQuestions.length*100)}점)
+최고점수: ${bestScore}점
+일시: ${new Date().toLocaleString('ko-KR')}`;
+            navigator.clipboard.writeText(text);
+            notify('📋 결과가 복사되었어요!', 'success');
+        }
+
+        function closeResult() {
+            document.getElementById('resultOverlay').classList.remove('show');
+            switchTab('study');
+        }
+
+        function openTeacherModal() {
+            if (prompt('비밀번호를 입력하세요:') !== '1234') return;
+
+            const results = JSON.parse(localStorage.getItem('asiaResults') || '[]');
+            const container = document.getElementById('resultList');
+
+            if (results.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">아직 결과가 없어요~ 📝</p>';
+            } else {
+                results.sort((a, b) => b.score - a.score);
+                container.innerHTML = results.map((r, i) => `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:15px;background:${i < 3 ? '#fff5f5' : '#f8f9fa'};border-radius:15px;margin-bottom:10px;border:2px solid ${i < 3 ? '#ffd1dc' : '#eee'};">
+                        <span style="color:#5d4e6d;">
+                            ${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1) + '.'} 
+                            <strong>${r.name}</strong> (${r.id})
+                        </span>
+                        <span style="color:#ff6b6b;font-size:1.2rem;"><strong>${r.score}점</strong></span>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('teacherModal').classList.add('show');
+        }
     </script>
 </body>
 </html>
