@@ -324,6 +324,13 @@
         <div class="modal-content">
             <h2>📊 학생 퀴즈 결과</h2>
             <div id="resultList"></div>
+            <div style="margin-top:20px;padding:16px;background:#f8f0ff;border-radius:16px;border:2px dashed #c5b8fe;">
+                <p style="color:#5d4e6d;font-size:0.95rem;margin-bottom:8px;">📨 학생 공유 코드 붙여넣기</p>
+                <p style="color:#aaa;font-size:0.8rem;margin-bottom:10px;">학생이 '🔗 공유 코드' 버튼으로 복사한 코드를 붙여넣으면 결과가 추가돼요.</p>
+                <textarea id="importCodeArea" style="width:100%;padding:10px;border:2px solid #c5b8fe;border-radius:10px;font-size:0.8rem;font-family:monospace;resize:vertical;min-height:70px;background:#fff;color:#333;" placeholder="학생 공유 코드를 여기에 붙여넣으세요..."></textarea>
+                <button onclick="importResult()" style="margin-top:8px;padding:9px 20px;background:linear-gradient(135deg,#a29bfe,#c5b8fe);color:#fff;border:none;border-radius:12px;font-family:'Jua',sans-serif;cursor:pointer;font-size:0.9rem;">📥 결과 불러오기</button>
+                <button onclick="exportResults()" style="margin-top:8px;margin-left:8px;padding:9px 20px;background:#f0f0f0;color:#666;border:none;border-radius:12px;font-family:'Jua',sans-serif;cursor:pointer;font-size:0.9rem;">📤 전체 내보내기</button>
+            </div>
             <button class="modal-close" onclick="document.getElementById('teacherModal').classList.remove('show')">닫기</button>
         </div>
     </div>
@@ -361,9 +368,11 @@
                     <p id="attemptsLeft" style="color:#888;margin-top:10px;"></p>
                     <div style="margin-top:15px;">
                         <button class="result-btn primary" onclick="copyResult()">📋 결과 복사</button>
+                        <button class="result-btn" style="background:linear-gradient(135deg,#a29bfe,#c5b8fe);color:#fff;" onclick="generateShareCode()">🔗 공유 코드</button>
                         <button class="result-btn retry" id="retryBtn" onclick="retryQuiz()" style="display:none;">🔄 다시 도전</button>
                         <button class="result-btn secondary" onclick="closeResult()">확인</button>
                     </div>
+                    <p style="font-size:0.8rem;color:#aaa;margin-top:10px;">💡 공유 코드를 선생님께 전달하면 결과를 수집할 수 있어요!</p>
                 </div>
 
                 <button class="hint-btn" id="hintBtn" onclick="showHint()">💡 힌트 보기</button>
@@ -417,6 +426,7 @@
             QUIZ_DEFAULT: '#b8d4e8',     // 연파랑 - 퀴즈 기본
             QUIZ_CORRECT: '#a8e6cf',     // 초록 - 정답
             QUIZ_WRONG: '#f5b7b1',       // 연빨강 - 오답
+            QUIZ_USED: '#9e9e9e',        // 어두운 회색 - 이미 출제된 국가
             OTHER_COUNTRY: '#e8e8e8'     // 회색 - 기타 국가
         };
 
@@ -816,6 +826,26 @@
             const c = countries[code];
             document.getElementById('quizCountryName').textContent = `${c.flag} ${c.name}`;
             document.getElementById('hintText').classList.remove('show');
+
+            // 이미 출제된 국가를 어두운 회색으로 표시
+            quizQuestions.slice(0, currentQuizIndex).forEach(usedCode => {
+                if (countryLayers[usedCode]) {
+                    countryLayers[usedCode].setStyle({
+                        fillColor: COLORS.QUIZ_USED,
+                        weight: 1,
+                        color: '#777',
+                        fillOpacity: 0.55
+                    });
+                }
+                if (usedCode === 'SG' && singaporeMarker) {
+                    singaporeMarker.setIcon(L.divIcon({
+                        className: '',
+                        html: `<div style="width:22px;height:22px;background:${COLORS.QUIZ_USED};border:2px solid #777;border-radius:50%;opacity:0.7;"></div>`,
+                        iconSize: [26, 26],
+                        iconAnchor: [13, 13]
+                    }));
+                }
+            });
         }
 
         function checkQuizAnswer(code) {
@@ -863,17 +893,25 @@
             updateQuizUI();
 
             setTimeout(() => {
+                // 정답/오답 확인이 끝난 국가들을 QUIZ_USED(어두운 회색)로 처리
                 [code, correct].forEach(c => {
-                    countryLayers[c]?.setStyle({ fillColor: COLORS.QUIZ_DEFAULT, weight: 1.5, color: '#666', fillOpacity: 0.7 });
+                    if (countryLayers[c]) {
+                        countryLayers[c].setStyle({
+                            fillColor: COLORS.QUIZ_USED,
+                            weight: 1,
+                            color: '#777',
+                            fillOpacity: 0.55
+                        });
+                    }
                 });
-                if (singaporeMarker) {
-                    const sgQuizIcon = L.divIcon({
+                // SG가 이번 문제에 포함됐으면 회색 마커로
+                if (singaporeMarker && (code === 'SG' || correct === 'SG')) {
+                    singaporeMarker.setIcon(L.divIcon({
                         className: '',
-                        html: `<div style="width:24px;height:24px;background:${COLORS.QUIZ_DEFAULT};border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;"></div>`,
-                        iconSize: [28, 28],
-                        iconAnchor: [14, 14]
-                    });
-                    singaporeMarker.setIcon(sgQuizIcon);
+                        html: `<div style="width:22px;height:22px;background:${COLORS.QUIZ_USED};border:2px solid #777;border-radius:50%;opacity:0.7;"></div>`,
+                        iconSize: [26, 26],
+                        iconAnchor: [13, 13]
+                    }));
                 }
                 currentQuizIndex++;
                 showQuestion();
@@ -1018,28 +1056,81 @@
             notify('📋 결과가 복사되었어요!', 'success');
         }
 
+        // ① 공유 코드 생성 (학생이 선생님께 전달)
+        function generateShareCode() {
+            const payload = {
+                id: currentUser.id,
+                name: currentUser.name,
+                score: bestScore,
+                time: new Date().toLocaleString('ko-KR')
+            };
+            const code = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+            navigator.clipboard.writeText(code)
+                .then(() => notify('🔗 공유 코드가 복사됐어요! 선생님께 전달하세요.', 'success'))
+                .catch(() => prompt('아래 코드를 복사해 선생님께 전달하세요:', code));
+        }
+
+        // ① 선생님이 공유 코드를 붙여넣어 결과 수집
+        function importResult() {
+            const code = document.getElementById('importCodeArea').value.trim();
+            if (!code) { notify('공유 코드를 붙여넣어 주세요.', 'error'); return; }
+            try {
+                const payload = JSON.parse(decodeURIComponent(escape(atob(code))));
+                let results = JSON.parse(localStorage.getItem('asiaResults') || '[]');
+                const existing = results.find(r => r.id === payload.id);
+                if (existing) {
+                    if (payload.score > existing.score) {
+                        existing.score = payload.score;
+                        existing.time  = payload.time;
+                    }
+                    notify(`✅ ${payload.name} 결과 업데이트 완료!`, 'success');
+                } else {
+                    results.push({ id: payload.id, name: payload.name, score: payload.score, time: payload.time });
+                    notify(`✅ ${payload.name} 결과 추가 완료!`, 'success');
+                }
+                localStorage.setItem('asiaResults', JSON.stringify(results));
+                document.getElementById('importCodeArea').value = '';
+                // 목록 새로고침
+                openTeacherModal(true);
+            } catch(e) {
+                notify('코드가 올바르지 않아요. 다시 확인해주세요.', 'error');
+            }
+        }
+
+        // ① 전체 결과 텍스트 내보내기
+        function exportResults() {
+            const results = JSON.parse(localStorage.getItem('asiaResults') || '[]');
+            if (results.length === 0) { notify('내보낼 결과가 없어요.', 'info'); return; }
+            results.sort((a, b) => b.score - a.score);
+            let text = `[아시아 탐험 여행 퀴즈 결과] ${new Date().toLocaleString('ko-KR')}\n${'='.repeat(38)}\n`;
+            results.forEach((r, i) => { text += `${i+1}. ${r.name} (${r.id}) - ${r.score}점  [${r.time||''}]\n`; });
+            navigator.clipboard.writeText(text)
+                .then(() => notify('📤 전체 결과가 복사됐어요!', 'success'))
+                .catch(() => alert(text));
+        }
+
         function closeResult() {
             document.getElementById('resultOverlay').classList.remove('show');
             switchTab('study');
         }
 
-        function openTeacherModal() {
-            if (prompt('비밀번호를 입력하세요:') !== '1234') return;
+        function openTeacherModal(skipPrompt) {
+            if (!skipPrompt && prompt('비밀번호를 입력하세요:') !== '1234') return;
 
             const results = JSON.parse(localStorage.getItem('asiaResults') || '[]');
             const container = document.getElementById('resultList');
 
             if (results.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">아직 결과가 없어요~ 📝</p>';
+                container.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">아직 결과가 없어요~ 📝<br><small>학생이 퀴즈를 완료한 뒤 🔗 공유 코드를 받아 아래에 붙여넣으세요.</small></p>';
             } else {
                 results.sort((a, b) => b.score - a.score);
                 container.innerHTML = results.map((r, i) => `
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:15px;background:${i < 3 ? '#fff5f5' : '#f8f9fa'};border-radius:15px;margin-bottom:10px;border:2px solid ${i < 3 ? '#ffd1dc' : '#eee'};">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 15px;background:${i < 3 ? '#fff5f5' : '#f8f9fa'};border-radius:15px;margin-bottom:8px;border:2px solid ${i < 3 ? '#ffd1dc' : '#eee'};">
                         <span style="color:#5d4e6d;">
-                            ${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1) + '.'} 
-                            <strong>${r.name}</strong> (${r.id})
+                            ${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1) + '.'}
+                            <strong>${r.name}</strong> <span style="color:#aaa;font-size:0.85rem;">(${r.id})</span>
                         </span>
-                        <span style="color:#ff6b6b;font-size:1.2rem;"><strong>${r.score}점</strong></span>
+                        <span style="color:#ff6b6b;font-size:1.1rem;"><strong>${r.score}점</strong></span>
                     </div>
                 `).join('');
             }
